@@ -83,7 +83,7 @@ with httpx.Client() as client:
 
 # ── 2. Upload Ozarak.jpg to Storage ─────────────────────────────────────────
 IMAGE_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "Ozarak.jpg")
+    os.path.join(os.path.dirname(__file__), "..", "seeds", "images", "Ozarak.jpg")
 )
 
 print(f"\n[2/3] Uploading image: {IMAGE_PATH}")
