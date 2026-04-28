@@ -1,12 +1,13 @@
 from fastapi import Header, HTTPException, status
-import jwt as pyjwt
+import httpx
 from config import get_settings
 
 
 async def get_current_user(authorization: str = Header(...)) -> dict:
     """
-    Validates the Supabase-issued Bearer token from the Authorization header.
-    Returns the decoded user payload on success, raises HTTP 401 on failure.
+    Validates the Bearer token by calling the Supabase Auth API.
+    Works with any JWT algorithm Supabase uses (HS256, ES256, etc.).
+    Returns the user payload on success, raises HTTP 401 on failure.
     """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -20,21 +21,19 @@ async def get_current_user(authorization: str = Header(...)) -> dict:
     token = authorization.removeprefix("Bearer ").strip()
     settings = get_settings()
 
-    try:
-        payload = pyjwt.decode(
-            token,
-            settings.supabase_jwt_secret,
-            algorithms=["HS256"],
-            options={"verify_aud": False},
-        )
-    except pyjwt.PyJWTError:
+    resp = httpx.get(
+        f"{settings.supabase_url}/auth/v1/user",
+        headers={
+            "apikey":        settings.supabase_service_key,
+            "Authorization": f"Bearer {token}",
+        },
+    )
+
+    if resp.status_code != 200:
         raise credentials_exception
 
-    user_id: str = payload.get("sub")
-    if not user_id:
-        raise credentials_exception
-
+    user_data = resp.json()
     return {
-        "id": user_id,
-        "email": payload.get("email", ""),
+        "id":    user_data["id"],
+        "email": user_data.get("email", ""),
     }
