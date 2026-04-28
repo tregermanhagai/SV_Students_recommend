@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home – SV Students Recommend</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+
+<!-- Global Header -->
+<header class="global-header">
+  <a class="header-logo" href="home.html">
+    <img src="../assets/SVCollege_logo.png" alt="SV College" data-test="logo-svcollege" />
+    <span>SV Recommend</span>
+  </a>
+  <nav class="header-nav">
+    <a class="nav-link" href="#" id="btnHelp"  data-test="nav-help">Help</a>
+    <a class="nav-link" href="#" id="btnAbout" data-test="nav-about">About</a>
+    <a class="nav-link" href="profile.html"    data-test="nav-profile">My Profile</a>
+    <a class="nav-link" href="#" id="btnLogout" data-test="nav-logout">Logout</a>
+    <a class="btn-accent" href="add-recommendation.html" data-test="nav-signup-recommendations">+ Add Recommendation</a>
+  </nav>
+</header>
+
+<!-- Main Content -->
+<main class="container">
+  <div class="feed-controls">
+    <h2>Recommendations</h2>
+    <div class="filter-bar" data-test="section-filters">
+      <button class="filter-btn active" data-category="" data-test="filter-all">All</button>
+      <button class="filter-btn" data-category="Book"     data-test="filter-book">Book</button>
+      <button class="filter-btn" data-category="Movie"    data-test="filter-movie">Movie</button>
+      <button class="filter-btn" data-category="Series"   data-test="filter-series">Series</button>
+      <button class="filter-btn" data-category="Activity" data-test="filter-activity">Activity</button>
+      <button class="filter-btn" data-category="Other"    data-test="filter-other">Other</button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" id="loadingFeed" data-test="loading-feed">
+    <div class="spinner"></div>
+    <p>Loading recommendations…</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" id="emptyFeed" data-test="empty-feed" style="display:none">
+    <div class="icon">📭</div>
+    <h3>No recommendations yet</h3>
+    <p>Be the first to add one!</p>
+    <br/>
+    <a href="add-recommendation.html" class="btn btn-primary" style="width:auto;display:inline-block;padding:10px 28px" data-test="btn-add-first">
+      Add Recommendation
+    </a>
+  </div>
+
+  <!-- Grid -->
+  <div class="recommendation-grid" id="recommendationGrid" data-test="section-feed" style="display:none"></div>
+</main>
+
+<!-- Help Modal -->
+<div class="modal-overlay" id="helpModal" data-test="modal-help">
+  <div class="modal">
+    <button class="modal-close" id="closeHelp" data-test="btn-close-help" aria-label="Close">✕</button>
+    <h3>Help</h3>
+    <p>
+      Welcome to <strong>SV Students Recommend</strong>! Browse recommendations from your classmates,
+      add your own, leave comments and star ratings.<br/><br/>
+      Visit <strong>My Profile</strong> to find your <em>API Bearer token</em> for practicing REST API testing.
+    </p>
+  </div>
+</div>
+
+<!-- About Modal -->
+<div class="modal-overlay" id="aboutModal" data-test="modal-about">
+  <div class="modal">
+    <button class="modal-close" id="closeAbout" data-test="btn-close-about" aria-label="Close">✕</button>
+    <h3>About</h3>
+    <p>
+      SV Students Recommend is a sandbox application built for <strong>SV College</strong>
+      students to practice end-to-end testing with <em>Playwright</em>, <em>Python</em>,
+      and <em>Pytest</em>, as well as REST API testing.<br/><br/>
+      Every interactive element has a <code>data-test</code> attribute for reliable test automation.
+    </p>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/home.js"></script>
+</body>
+</html>

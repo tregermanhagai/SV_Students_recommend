@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recommendation – SV Students Recommend</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+
+<!-- Global Header -->
+<header class="global-header">
+  <a class="header-logo" href="home.html">
+    <img src="../assets/SVCollege_logo.png" alt="SV College" data-test="logo-svcollege" />
+    <span>SV Recommend</span>
+  </a>
+  <nav class="header-nav">
+    <a class="nav-link" href="home.html"    data-test="nav-home">Home</a>
+    <a class="nav-link" href="profile.html" data-test="nav-profile">My Profile</a>
+    <a class="nav-link" href="#" id="btnLogout" data-test="nav-logout">Logout</a>
+  </nav>
+</header>
+
+<main class="container">
+
+  <!-- Loading State -->
+  <div class="loading-state" id="loadingDetail" data-test="loading-detail">
+    <div class="spinner"></div>
+    <p>Loading…</p>
+  </div>
+
+  <!-- Detail Content -->
+  <div id="detailContent" style="display:none">
+
+    <div class="detail-layout">
+      <!-- Image -->
+      <div class="detail-image-wrap">
+        <img id="detailImage" src="" alt="" data-test="detail-image" />
+      </div>
+
+      <!-- Info -->
+      <div class="detail-info">
+        <span class="detail-category-badge" id="detailCategory" data-test="detail-category"></span>
+        <h1 class="detail-title" id="detailTitle" data-test="detail-title"></h1>
+
+        <div class="detail-meta-row">
+          <span><strong>Recommended by:</strong> <span id="detailRecommenderName" data-test="detail-recommender-name"></span></span>
+          <span id="detailWebsiteWrap" style="display:none">
+            <strong>Website:</strong>
+            <a id="detailWebsiteLink" href="#" target="_blank" rel="noopener" data-test="detail-website-link"></a>
+          </span>
+          <span><strong>Comments:</strong> <span id="detailCommentCount" data-test="detail-recommender-count">0</span></span>
+        </div>
+
+        <p class="detail-description" id="detailDescription" data-test="detail-description"></p>
+
+        <div class="detail-actions" id="ownerActions" style="display:none">
+          <a href="#" id="btnEdit"   class="btn btn-secondary" data-test="btn-edit-recommendation">Edit</a>
+          <button id="btnDelete" class="btn btn-danger"   data-test="btn-delete-recommendation">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comments Section -->
+    <section class="comments-section" data-test="section-comments">
+      <h3>Comments &amp; Ratings</h3>
+
+      <!-- Comments list -->
+      <div id="commentsList"></div>
+      <div class="empty-state" id="noComments" data-test="no-comments" style="display:none">
+        <div class="icon">💬</div>
+        <h3>No comments yet</h3>
+        <p>Be the first to share your thoughts!</p>
+      </div>
+
+      <!-- Add Comment Form (shown when logged in) -->
+      <div id="commentFormWrap" style="display:none; margin-top:24px;">
+        <div class="page-card" style="max-width:100%">
+          <h3 style="font-size:1rem; margin-bottom:14px; color:var(--primary)">Leave a Comment</h3>
+
+          <div class="alert alert-error" id="commentError" data-test="error-comment"></div>
+
+          <form id="commentForm" data-test="form-add-comment" novalidate>
+            <div class="form-group">
+              <label>Star Rating <span class="required">*</span></label>
+              <div class="star-rating-input" data-test="star-rating">
+                <input type="radio" id="star5" name="rating" value="5" data-test="star-5" /><label for="star5">★</label>
+                <input type="radio" id="star4" name="rating" value="4" data-test="star-4" /><label for="star4">★</label>
+                <input type="radio" id="star3" name="rating" value="3" data-test="star-3" /><label for="star3">★</label>
+                <input type="radio" id="star2" name="rating" value="2" data-test="star-2" /><label for="star2">★</label>
+                <input type="radio" id="star1" name="rating" value="1" data-test="star-1" /><label for="star1">★</label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="commentText">Comment</label>
+              <textarea
+                id="commentText"
+                class="form-control"
+                placeholder="Share your thoughts… (optional)"
+                data-test="textarea-comment"
+              ></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:auto;padding:10px 28px" data-test="btn-submit-comment">
+              Post Comment
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Not-logged-in notice -->
+      <div id="loginToComment" style="display:none; margin-top:20px; text-align:center; color:var(--text-muted); font-size:0.92rem">
+        <a href="login.html" data-test="link-login-to-comment">Sign in</a> to leave a comment.
+      </div>
+    </section>
+  </div>
+
+</main>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal" data-test="modal-delete-confirm">
+  <div class="modal">
+    <button class="modal-close" id="closeDeleteModal" data-test="btn-close-delete-modal" aria-label="Close">✕</button>
+    <h3>Delete Recommendation</h3>
+    <p>Are you sure you want to delete this recommendation? This action cannot be undone.</p>
+    <div style="display:flex; gap:12px; margin-top:20px">
+      <button id="confirmDelete" class="btn btn-danger" style="flex:1" data-test="btn-confirm-delete">Delete</button>
+      <button id="cancelDelete"  class="btn btn-secondary" style="flex:1" data-test="btn-cancel-delete">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/recommendation-detail.js"></script>
+</body>
+</html>

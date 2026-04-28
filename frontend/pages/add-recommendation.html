@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Recommendation – SV Students Recommend</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+
+<!-- Global Header -->
+<header class="global-header">
+  <a class="header-logo" href="home.html">
+    <img src="../assets/SVCollege_logo.png" alt="SV College" data-test="logo-svcollege" />
+    <span>SV Recommend</span>
+  </a>
+  <nav class="header-nav">
+    <a class="nav-link" href="home.html"    data-test="nav-home">Home</a>
+    <a class="nav-link" href="profile.html" data-test="nav-profile">My Profile</a>
+    <a class="nav-link" href="#" id="btnLogout" data-test="nav-logout">Logout</a>
+  </nav>
+</header>
+
+<main class="container">
+  <div class="page-card">
+    <h2>Add Recommendation</h2>
+
+    <div class="alert alert-error"   id="errorMsg"   data-test="error-message"></div>
+    <div class="alert alert-success" id="successMsg" data-test="success-message"></div>
+
+    <form id="addForm" data-test="form-add-recommendation" novalidate>
+
+      <div class="form-group">
+        <label for="category">Category <span class="required">*</span></label>
+        <select id="category" class="form-control" data-test="select-category" required>
+          <option value="Movie"    selected>Movie</option>
+          <option value="Book">Book</option>
+          <option value="Series">Series</option>
+          <option value="Activity">Activity</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="recName">Recommendation Name <span class="required">*</span></label>
+        <input
+          type="text"
+          id="recName"
+          class="form-control"
+          placeholder="e.g. Inception, The Alchemist…"
+          data-test="input-recommendation-name"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="recommenderName">Your Name <span class="required">*</span></label>
+        <input
+          type="text"
+          id="recommenderName"
+          class="form-control"
+          placeholder="Name to display as recommender"
+          data-test="input-recommender-name"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea
+          id="description"
+          class="form-control"
+          placeholder="Why do you recommend this? (optional)"
+          data-test="textarea-description"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="websiteLink">Website Link</label>
+        <input
+          type="url"
+          id="websiteLink"
+          class="form-control"
+          placeholder="https://…"
+          data-test="input-website-link"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="imageInput">Image</label>
+        <input
+          type="file"
+          id="imageInput"
+          class="form-control"
+          accept="image/jpeg,image/png,image/gif,image/webp"
+          data-test="input-image"
+        />
+        <div class="image-preview-wrap" id="imagePreviewWrap">
+          <img id="imagePreview" src="" alt="Preview" data-test="image-preview" />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a href="home.html" class="btn btn-secondary" data-test="btn-cancel">Cancel</a>
+        <button type="submit" class="btn btn-primary" data-test="btn-submit-recommendation">
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/add-recommendation.js"></script>
+</body>
+</html>

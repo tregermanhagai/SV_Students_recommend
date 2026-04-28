@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login – SV Students Recommend</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <img src="../assets/SVCollege_logo.png" alt="SV College" data-test="logo-svcollege" />
+      <h2>Welcome Back</h2>
+      <p>SV Students Recommend</p>
+    </div>
+
+    <div class="alert alert-success" id="registeredBanner" data-test="registered-banner"></div>
+    <div class="alert alert-error"   id="errorMsg"         data-test="error-message"></div>
+
+    <form id="loginForm" data-test="form-login" novalidate>
+      <div class="form-group">
+        <label for="email">Email <span class="required">*</span></label>
+        <input
+          type="email"
+          id="email"
+          class="form-control"
+          placeholder="you@example.com"
+          autocomplete="email"
+          data-test="input-email"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password <span class="required">*</span></label>
+        <input
+          type="password"
+          id="password"
+          class="form-control"
+          placeholder="Your password"
+          autocomplete="current-password"
+          data-test="input-password"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary" data-test="btn-login">
+        Sign In
+      </button>
+    </form>
+
+    <div class="divider"><span>or</span></div>
+
+    <button class="btn btn-google" id="btnGoogleLogin" data-test="btn-google-login" type="button">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+      Continue with Google
+    </button>
+
+    <p style="text-align:center; margin-top:16px; font-size:0.9rem; color:var(--text-muted)">
+      Don't have an account?
+      <a href="register.html" data-test="link-register">Register here</a>
+    </p>
+  </div>
+</div>
+
+<script src="../js/auth.js"></script>
+<script src="../js/login.js"></script>
+</body>
+</html>

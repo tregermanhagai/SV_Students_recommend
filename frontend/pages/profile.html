@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile – SV Students Recommend</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+
+<!-- Global Header -->
+<header class="global-header">
+  <a class="header-logo" href="home.html">
+    <img src="../assets/SVCollege_logo.png" alt="SV College" data-test="logo-svcollege" />
+    <span>SV Recommend</span>
+  </a>
+  <nav class="header-nav">
+    <a class="nav-link" href="home.html" data-test="nav-home">Home</a>
+    <a class="nav-link" href="#" id="btnLogout" data-test="nav-logout">Logout</a>
+    <a class="btn-accent" href="add-recommendation.html" data-test="nav-signup-recommendations">+ Add Recommendation</a>
+  </nav>
+</header>
+
+<main class="container">
+  <div class="page-card">
+    <h2 style="margin-bottom:24px">My Profile</h2>
+
+    <div class="profile-section">
+      <h3>Name</h3>
+      <div class="profile-value" id="profileName" data-test="profile-name">—</div>
+    </div>
+
+    <div class="profile-section">
+      <h3>Email</h3>
+      <div class="profile-value" id="profileEmail" data-test="profile-email">—</div>
+    </div>
+
+    <hr style="border:none; border-top:1.5px solid var(--border); margin:24px 0" />
+
+    <div class="profile-section">
+      <h3>API Bearer Token</h3>
+      <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:10px">
+        Use this token to authenticate REST API requests.<br />
+        Add it as the <code>Authorization</code> header: <code>Bearer &lt;token&gt;</code>
+      </p>
+      <div class="token-box" id="tokenDisplay" data-test="token-display">Loading…</div>
+      <div class="copy-row">
+        <button class="btn btn-secondary" id="btnCopyToken" data-test="btn-copy-token" style="width:auto; padding:8px 20px">
+          Copy Token
+        </button>
+        <span class="copy-status" id="copyStatus" data-test="token-copy-status">✓ Copied!</span>
+      </div>
+    </div>
+
+    <div class="api-docs-box">
+      <h4>Practice the API</h4>
+      <p>
+        Open the interactive API documentation at
+        <a href="/docs" target="_blank" data-test="link-api-docs">/docs</a>
+        to explore and test all endpoints.<br /><br />
+        Click <strong>Authorize</strong> in Swagger, paste your token above,
+        then try GET, POST, PUT, and DELETE on recommendations.
+      </p>
+    </div>
+
+    <div style="margin-top:20px">
+      <button class="btn btn-secondary" id="btnLogoutBottom" data-test="btn-logout" style="width:auto; padding:8px 24px">
+        Logout
+      </button>
+    </div>
+  </div>
+</main>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/profile.js"></script>
+</body>
+</html>
