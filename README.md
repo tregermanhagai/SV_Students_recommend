@@ -4,6 +4,17 @@ A practice sandbox application for SV College students to learn:
 - **End-to-end (E2E) testing** using Playwright, Python, and Pytest
 - **REST API testing** using Bearer token authentication
 
+## Demo Account
+
+| Field    | Value                    |
+|----------|--------------------------|
+| Email    | hagai@svcollege.co.il    |
+| Password | test1234                 |
+
+Run `python backend/seed.py` to create this account and load the sample data.
+
+---
+
 ## Quick Start (Local Development)
 
 ### 1. Supabase Setup
