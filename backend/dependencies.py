@@ -1,5 +1,5 @@
 from fastapi import Header, HTTPException, status
-from jose import JWTError, jwt
+import jwt as pyjwt
 from config import get_settings
 
 
@@ -21,13 +21,13 @@ async def get_current_user(authorization: str = Header(...)) -> dict:
     settings = get_settings()
 
     try:
-        payload = jwt.decode(
+        payload = pyjwt.decode(
             token,
             settings.supabase_jwt_secret,
             algorithms=["HS256"],
             options={"verify_aud": False},
         )
-    except JWTError:
+    except pyjwt.PyJWTError:
         raise credentials_exception
 
     user_id: str = payload.get("sub")
