@@ -84,5 +84,20 @@ def test_admin_creates_recommendation(page: Page):
     page.goto(f"{BASE_URL}/pages/home.html")
     expect(page.get_by_test_id("section-feed")).to_be_visible(timeout=8_000)
 
-    titles = page.get_by_test_id("card-title")
-    expect(titles.filter(has_text=RECOMMENDATION["name"]).first).to_be_visible()
+    card = page.get_by_test_id("card-title").filter(has_text=RECOMMENDATION["name"]).first
+    expect(card).to_be_visible()
+
+    # ── Step 6: Open recommendation detail page ───────────────────
+    card.click()
+    expect(page.get_by_test_id("detail-title")).to_have_text(RECOMMENDATION["name"], timeout=8_000)
+
+    # ── Step 7: Submit 5-star rating + comment ────────────────────
+    # Radio inputs are hidden by CSS; click the visible label instead
+    page.locator('label[for="star5"]').click()
+    page.get_by_test_id("textarea-comment").fill("Amazing movie, highly recommended!")
+    page.get_by_test_id("btn-submit-comment").click()
+
+    # ── Step 8: Verify the comment appears in the list ────────────
+    comment = page.get_by_test_id("comment-item").first
+    expect(comment).to_be_visible(timeout=8_000)
+    expect(page.get_by_test_id("comment-text").first).to_have_text("Amazing movie, highly recommended!")

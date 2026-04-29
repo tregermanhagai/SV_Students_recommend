@@ -40,7 +40,7 @@ img { max-width: 100%; display: block; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
+  height: 80px;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -55,7 +55,7 @@ img { max-width: 100%; display: block; }
 }
 
 .header-logo img {
-  height: 42px;
+  height: 64px;
   width: auto;
   border-radius: 4px;
 }
