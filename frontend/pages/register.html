@@ -50,15 +50,18 @@
 
       <div class="form-group">
         <label for="password">Password <span class="required">*</span></label>
-        <input
-          type="password"
-          id="password"
-          class="form-control"
-          placeholder="Minimum 4 English characters"
-          autocomplete="new-password"
-          data-test="input-password"
-          required
-        />
+        <div class="input-wrap">
+          <input
+            type="password"
+            id="password"
+            class="form-control"
+            placeholder="Minimum 4 English characters"
+            autocomplete="new-password"
+            data-test="input-password"
+            required
+          />
+          <button type="button" class="btn-eye" data-test="btn-toggle-password"></button>
+        </div>
       </div>
 
       <div class="form-group" id="captchaWrap" data-test="captcha-wrap">

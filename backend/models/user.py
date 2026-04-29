@@ -34,3 +34,21 @@ class UserOut(BaseModel):
     name: str
     email: str
     access_token: str
+
+
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+    redirect_to: str = ""
+
+
+class PasswordChange(BaseModel):
+    new_password: str
+
+    @field_validator("new_password")
+    @classmethod
+    def password_rules(cls, v: str) -> str:
+        if len(v) < 4:
+            raise ValueError("Password must be at least 4 characters.")
+        if not re.match(r"^[\x20-\x7E]+$", v):
+            raise ValueError("Password must contain English characters only.")
+        return v

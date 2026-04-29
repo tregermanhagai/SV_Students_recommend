@@ -1,6 +1,8 @@
+import httpx
 from fastapi import APIRouter, HTTPException, status
-from models.user import UserRegister, UserLogin, UserOut
+from models.user import UserRegister, UserLogin, UserOut, PasswordResetRequest
 from services.supabase_client import get_supabase
+from config import get_settings
 
 router = APIRouter()
 
@@ -91,3 +93,22 @@ def login(body: UserLogin):
         email=result.user.email,
         access_token=result.session.access_token,
     )
+
+
+@router.post(
+    "/recover",
+    summary="Send a password reset email",
+)
+def request_password_reset(body: PasswordResetRequest):
+    """Triggers Supabase to send a password-reset email to the given address."""
+    settings = get_settings()
+    httpx.post(
+        f"{settings.supabase_url}/auth/v1/recover",
+        headers={
+            "apikey":        settings.supabase_service_key,
+            "Content-Type":  "application/json",
+        },
+        json={"email": body.email, "redirect_to": body.redirect_to},
+    )
+    # Always return success — never reveal whether the email exists
+    return {"message": "If that email is registered, a reset link has been sent."}

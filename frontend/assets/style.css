@@ -186,6 +186,16 @@ select.form-control { appearance: none; background-image: url("data:image/svg+xm
 
 textarea.form-control { resize: vertical; min-height: 90px; }
 
+/* Password field with show/hide eye toggle */
+.input-wrap { position: relative; }
+.input-wrap .form-control { padding-right: 44px; box-sizing: border-box; }
+.btn-eye {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; padding: 4px; line-height: 0;
+  color: var(--text-muted);
+}
+.btn-eye:hover { color: var(--primary); }
+
 /* ── Buttons ────────────────────────────────────────────────── */
 .btn {
   display: inline-block;

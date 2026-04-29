@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('captchaQuestion').textContent = `What is ${a} + ${b} ?`;
   }
 
+  wirePasswordToggle('password');
+
   // ── Form wiring ───────────────────────────────────────────────
   const form       = document.getElementById('registerForm');
   const errorMsg   = document.getElementById('errorMsg');

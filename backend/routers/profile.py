@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Header
 from config import get_settings
 from services.supabase_client import get_supabase
 from dependencies import get_current_user
+from models.user import PasswordChange
 
 router = APIRouter()
 
@@ -22,6 +23,29 @@ def get_profile(current_user: dict = Depends(get_current_user)):
         "email": current_user["email"],
         "name": name,
     }
+
+
+@router.put(
+    "/profile/password",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Change your password",
+)
+def change_password(body: PasswordChange, current_user: dict = Depends(get_current_user)):
+    """Updates the authenticated user's password."""
+    settings = get_settings()
+    resp = httpx.put(
+        f"{settings.supabase_url}/auth/v1/admin/users/{current_user['id']}",
+        headers={
+            "apikey":        settings.supabase_service_key,
+            "Authorization": f"Bearer {settings.supabase_service_key}",
+        },
+        json={"password": body.new_password},
+    )
+    if resp.status_code not in (200, 204):
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to update password. Please try again.",
+        )
 
 
 @router.delete(

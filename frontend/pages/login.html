@@ -35,21 +35,42 @@
 
       <div class="form-group">
         <label for="password">Password <span class="required">*</span></label>
-        <input
-          type="password"
-          id="password"
-          class="form-control"
-          placeholder="Your password"
-          autocomplete="current-password"
-          data-test="input-password"
-          required
-        />
+        <div class="input-wrap">
+          <input
+            type="password"
+            id="password"
+            class="form-control"
+            placeholder="Your password"
+            autocomplete="current-password"
+            data-test="input-password"
+            required
+          />
+          <button type="button" class="btn-eye" data-test="btn-toggle-password"></button>
+        </div>
+        <a href="#" id="linkForgotPassword" data-test="link-forgot-password"
+           style="font-size:0.83rem; float:right; margin-top:4px">Forgot password?</a>
       </div>
 
-      <button type="submit" class="btn btn-primary" data-test="btn-login">
+      <button type="submit" class="btn btn-primary" data-test="btn-login" style="margin-top:8px">
         Sign In
       </button>
     </form>
+
+    <!-- Inline forgot-password panel -->
+    <div id="forgotPanel" data-test="forgot-panel"
+         style="display:none; margin-top:16px; padding:14px 16px; border:1.5px solid var(--border);
+                border-radius:8px; background:#f8f9fa">
+      <p style="margin:0 0 10px; font-weight:600">Reset your password</p>
+      <input type="email" id="forgotEmail" class="form-control" placeholder="your@email.com"
+             data-test="input-forgot-email" style="margin-bottom:10px" />
+      <div style="display:flex; gap:8px; flex-wrap:wrap">
+        <button class="btn btn-primary" id="btnSendReset" data-test="btn-send-reset"
+                style="width:auto; padding:8px 18px">Send reset link</button>
+        <button class="btn btn-secondary" id="btnCancelReset" data-test="btn-cancel-reset"
+                style="width:auto; padding:8px 18px">Cancel</button>
+      </div>
+      <div id="forgotMsg" data-test="forgot-message" style="margin-top:10px; font-size:0.88rem"></div>
+    </div>
 
     <div class="divider"><span>or</span></div>
 

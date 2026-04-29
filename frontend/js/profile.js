@@ -32,6 +32,44 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => statusEl.classList.remove('visible'), 2000);
   });
 
+  // ── Eye toggles ────────────────────────────────────────────────
+  wirePasswordToggle('newPassword');
+  wirePasswordToggle('confirmPassword');
+
+  // ── Change password ─────────────────────────────────────────────
+  document.getElementById('btnChangePassword').addEventListener('click', async () => {
+    const newPw  = document.getElementById('newPassword').value;
+    const confPw = document.getElementById('confirmPassword').value;
+    const msgEl  = document.getElementById('passwordChangeMsg');
+
+    function showPwMsg(text, ok) {
+      msgEl.textContent   = text;
+      msgEl.style.color   = ok ? 'green' : 'var(--danger)';
+      msgEl.style.display = 'block';
+    }
+
+    if (newPw.length < 4)   return showPwMsg('Password must be at least 4 characters.', false);
+    if (newPw !== confPw)   return showPwMsg('Passwords do not match.', false);
+
+    const btn = document.getElementById('btnChangePassword');
+    btn.disabled = true; btn.textContent = 'Updating…';
+    msgEl.style.display = 'none';
+
+    try {
+      await apiFetch('/api/profile/password', {
+        method: 'PUT',
+        body: JSON.stringify({ new_password: newPw }),
+      });
+      document.getElementById('newPassword').value     = '';
+      document.getElementById('confirmPassword').value = '';
+      showPwMsg('Password updated successfully.', true);
+    } catch (err) {
+      showPwMsg(err.message || 'Failed to update password.', false);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Update Password';
+    }
+  });
+
   // ── Delete account (synchronous wiring — no async dependency) ─
   const confirmPanel = document.getElementById('deleteConfirm');
   const errEl        = document.getElementById('deleteError');

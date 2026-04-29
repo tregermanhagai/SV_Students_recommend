@@ -53,6 +53,30 @@
       </div>
     </div>
 
+    <hr style="border:none; border-top:1.5px solid var(--border); margin:24px 0" />
+
+    <div class="profile-section">
+      <h3>Change Password</h3>
+      <div style="max-width:360px; display:flex; flex-direction:column; gap:10px; margin-top:8px">
+        <div class="input-wrap">
+          <input type="password" id="newPassword" class="form-control"
+                 placeholder="New password (min 4 characters)"
+                 data-test="input-new-password" autocomplete="new-password" />
+          <button type="button" class="btn-eye" data-test="btn-toggle-new-password"></button>
+        </div>
+        <div class="input-wrap">
+          <input type="password" id="confirmPassword" class="form-control"
+                 placeholder="Confirm new password"
+                 data-test="input-confirm-password" autocomplete="new-password" />
+          <button type="button" class="btn-eye" data-test="btn-toggle-confirm-password"></button>
+        </div>
+        <button class="btn btn-primary" id="btnChangePassword" data-test="btn-change-password"
+                style="width:auto; padding:8px 20px">Update Password</button>
+        <div id="passwordChangeMsg" data-test="password-change-message"
+             style="font-size:0.88rem; display:none"></div>
+      </div>
+    </div>
+
     <div class="api-docs-box">
       <h4>Practice the API</h4>
       <p>

@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  wirePasswordToggle('password');
+
   // Show success banner if arriving from registration
   const params = new URLSearchParams(window.location.search);
   if (params.get('registered') === 'true') {
@@ -47,6 +49,45 @@ document.addEventListener('DOMContentLoaded', () => {
     } finally {
       btn.disabled = false;
       btn.textContent = 'Sign In';
+    }
+  });
+
+  // ── Forgot password ────────────────────────────────────────
+  const forgotPanel = document.getElementById('forgotPanel');
+  const forgotMsg   = document.getElementById('forgotMsg');
+
+  document.getElementById('linkForgotPassword').addEventListener('click', (e) => {
+    e.preventDefault();
+    forgotPanel.style.display = 'block';
+    forgotMsg.textContent = '';
+    forgotMsg.style.color = '';
+  });
+
+  document.getElementById('btnCancelReset').addEventListener('click', () => {
+    forgotPanel.style.display = 'none';
+  });
+
+  document.getElementById('btnSendReset').addEventListener('click', async () => {
+    const email = document.getElementById('forgotEmail').value.trim();
+    if (!email) { forgotMsg.textContent = 'Please enter your email.'; forgotMsg.style.color = 'var(--danger)'; return; }
+
+    const btn = document.getElementById('btnSendReset');
+    btn.disabled = true; btn.textContent = 'Sending…';
+    forgotMsg.textContent = '';
+
+    try {
+      const redirectTo = window.location.origin + '/pages/reset-password.html';
+      await apiFetch('/auth/recover', {
+        method: 'POST',
+        body: JSON.stringify({ email, redirect_to: redirectTo }),
+      });
+      forgotMsg.style.color = 'green';
+      forgotMsg.textContent = 'If that email is registered, a reset link has been sent. Check your inbox.';
+    } catch {
+      forgotMsg.style.color = 'var(--danger)';
+      forgotMsg.textContent = 'Something went wrong. Please try again.';
+    } finally {
+      btn.disabled = false; btn.textContent = 'Send reset link';
     }
   });
 
