@@ -40,8 +40,19 @@ document.addEventListener('DOMContentLoaded', () => {
     return '★'.repeat(count) + '☆'.repeat(5 - count);
   }
 
+  function makePlaceholder() {
+    const el = document.createElement('div');
+    el.className = 'no-image-placeholder';
+    el.innerHTML = `
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+      <span>No Image</span>`;
+    return el;
+  }
+
   function renderCard(rec) {
-    const imageUrl = rec.image_url || '../assets/no-image.jpg';
     const card = document.createElement('div');
     card.className = 'card';
     card.setAttribute('data-test', 'card-recommendation');
@@ -49,8 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     card.innerHTML = `
       <div class="card-image-wrap" data-test="card-image">
-        <img src="${imageUrl}" alt="${escapeHtml(rec.name)}" loading="lazy"
-             onerror="this.src='../assets/no-image.jpg'" />
         <span class="card-category-badge" data-test="card-category">${escapeHtml(rec.category)}</span>
       </div>
       <div class="card-body">
@@ -60,6 +69,20 @@ document.addEventListener('DOMContentLoaded', () => {
           💬 ${rec.comment_count} comment${rec.comment_count !== 1 ? 's' : ''}
         </div>
       </div>`;
+
+    // Insert image or placeholder — done via DOM so onerror is a real handler
+    const wrap = card.querySelector('.card-image-wrap');
+    const badge = wrap.querySelector('.card-category-badge');
+    if (rec.image_url) {
+      const img = document.createElement('img');
+      img.src     = rec.image_url;
+      img.alt     = rec.name;
+      img.loading = 'lazy';
+      img.onerror = () => img.replaceWith(makePlaceholder());
+      wrap.insertBefore(img, badge);
+    } else {
+      wrap.insertBefore(makePlaceholder(), badge);
+    }
 
     card.addEventListener('click', () => {
       window.location.href = `recommendation-detail.html?id=${rec.id}`;
