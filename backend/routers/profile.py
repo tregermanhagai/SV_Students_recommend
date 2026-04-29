@@ -12,9 +12,9 @@ router = APIRouter()
 def get_profile(current_user: dict = Depends(get_current_user)):
     """Returns the authenticated user's profile information."""
     sb = get_supabase()
-    profile = sb.table("profiles").select("*").eq("id", current_user["id"]).single().execute()
-
-    name = profile.data["name"] if profile.data else current_user.get("email", "")
+    profile = sb.table("profiles").select("*").eq("id", current_user["id"]).execute()
+    rows = profile.data or []
+    name = rows[0]["name"] if rows else current_user.get("email", "")
     return {
         "id": current_user["id"],
         "email": current_user["email"],

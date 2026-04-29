@@ -59,8 +59,9 @@ def add_comment(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recommendation not found.")
 
     # Fetch commenter's display name from profiles
-    profile = sb.table("profiles").select("name").eq("id", current_user["id"]).single().execute()
-    commenter_name = profile.data["name"] if profile.data else current_user.get("email", "Anonymous")
+    profile = sb.table("profiles").select("name").eq("id", current_user["id"]).execute()
+    rows = profile.data or []
+    commenter_name = rows[0]["name"] if rows else current_user.get("email", "Anonymous")
 
     row = {
         "recommendation_id": rec_id,
