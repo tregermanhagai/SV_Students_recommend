@@ -7,8 +7,10 @@
 CREATE TABLE IF NOT EXISTS public.profiles (
   id         UUID        PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   name       TEXT        NOT NULL,
+  is_admin   BOOLEAN     NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT now()
 );
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT false;
 
 -- ── 2. Auto-create profile on new user signup ───────────────
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -72,30 +74,51 @@ ALTER TABLE public.recommendations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.comments        ENABLE ROW LEVEL SECURITY;
 
 -- profiles: users can read/update their own profile
+DROP POLICY IF EXISTS "profiles_select" ON public.profiles;
+DROP POLICY IF EXISTS "profiles_update" ON public.profiles;
 CREATE POLICY "profiles_select" ON public.profiles FOR SELECT USING (true);
 CREATE POLICY "profiles_update" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 
--- recommendations: public read, authenticated write
+-- recommendations: public read, authenticated write, owner or admin can delete/update
+DROP POLICY IF EXISTS "recs_select"  ON public.recommendations;
+DROP POLICY IF EXISTS "recs_insert"  ON public.recommendations;
+DROP POLICY IF EXISTS "recs_update"  ON public.recommendations;
+DROP POLICY IF EXISTS "recs_delete"  ON public.recommendations;
 CREATE POLICY "recs_select"  ON public.recommendations FOR SELECT USING (true);
 CREATE POLICY "recs_insert"  ON public.recommendations FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "recs_update"  ON public.recommendations FOR UPDATE USING (auth.uid() = created_by);
-CREATE POLICY "recs_delete"  ON public.recommendations FOR DELETE USING (auth.uid() = created_by);
+CREATE POLICY "recs_update"  ON public.recommendations FOR UPDATE USING (
+  auth.uid() = created_by OR
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin)
+);
+CREATE POLICY "recs_delete"  ON public.recommendations FOR DELETE USING (
+  auth.uid() = created_by OR
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin)
+);
 
--- comments: public read, authenticated write
+-- comments: public read, authenticated write, owner or admin can delete
+DROP POLICY IF EXISTS "comments_select" ON public.comments;
+DROP POLICY IF EXISTS "comments_insert" ON public.comments;
+DROP POLICY IF EXISTS "comments_update" ON public.comments;
+DROP POLICY IF EXISTS "comments_delete" ON public.comments;
 CREATE POLICY "comments_select" ON public.comments FOR SELECT USING (true);
 CREATE POLICY "comments_insert" ON public.comments FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 CREATE POLICY "comments_update" ON public.comments FOR UPDATE USING (auth.uid() = commenter_id);
-CREATE POLICY "comments_delete" ON public.comments FOR DELETE USING (auth.uid() = commenter_id);
+CREATE POLICY "comments_delete" ON public.comments FOR DELETE USING (
+  auth.uid() = commenter_id OR
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin)
+);
 
 -- ── 6. Indexes for performance ───────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_recs_created_at  ON public.recommendations (created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_recs_category    ON public.recommendations (category);
 CREATE INDEX IF NOT EXISTS idx_comments_rec_id  ON public.comments (recommendation_id);
 
--- ── 7. Storage bucket (run via Supabase dashboard or CLI) ────
--- Create a PUBLIC bucket named: recommendation-images
--- Dashboard: Storage → New Bucket → name "recommendation-images" → Public ✓
--- Or via SQL (requires storage extension):
--- INSERT INTO storage.buckets (id, name, public)
--- VALUES ('recommendation-images', 'recommendation-images', true)
--- ON CONFLICT (id) DO NOTHING;
+-- ── 7. Grant admin by email (run AFTER the admin user registers) ────────────
+-- UPDATE public.profiles
+-- SET is_admin = true
+-- WHERE id = (SELECT id FROM auth.users WHERE email = 'hagai@svcollege.co.il');
+
+-- ── 8. Storage bucket ────────────────────────────────────────
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('recommendation-images', 'recommendation-images', true)
+ON CONFLICT (id) DO NOTHING;

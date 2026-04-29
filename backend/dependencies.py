@@ -33,7 +33,22 @@ async def get_current_user(authorization: str = Header(...)) -> dict:
         raise credentials_exception
 
     user_data = resp.json()
+    user_id = user_data["id"]
+
+    profile = httpx.get(
+        f"{settings.supabase_url}/rest/v1/profiles",
+        params={"id": f"eq.{user_id}", "select": "is_admin"},
+        headers={
+            "apikey":        settings.supabase_service_key,
+            "Authorization": f"Bearer {settings.supabase_service_key}",
+        },
+    )
+    is_admin = False
+    if profile.status_code == 200 and profile.json():
+        is_admin = bool(profile.json()[0].get("is_admin", False))
+
     return {
-        "id":    user_data["id"],
-        "email": user_data.get("email", ""),
+        "id":       user_id,
+        "email":    user_data.get("email", ""),
+        "is_admin": is_admin,
     }

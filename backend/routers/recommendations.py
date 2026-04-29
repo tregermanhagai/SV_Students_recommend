@@ -149,7 +149,7 @@ def update_recommendation(
     if not existing.data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recommendation not found.")
 
-    if existing.data.get("created_by") != current_user["id"]:
+    if existing.data.get("created_by") != current_user["id"] and not current_user.get("is_admin"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can only edit your own recommendations.")
 
     updates = body.model_dump(exclude_none=True)
@@ -189,7 +189,7 @@ def delete_recommendation(
     if not existing.data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recommendation not found.")
 
-    if existing.data.get("created_by") != current_user["id"]:
+    if existing.data.get("created_by") != current_user["id"] and not current_user.get("is_admin"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can only delete your own recommendations.")
 
     if existing.data.get("image_url"):

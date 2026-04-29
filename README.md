@@ -79,6 +79,37 @@ const SUPABASE_ANON = 'your-anon-key';
 
 Full interactive docs at `/docs` (Swagger UI).
 
+## Running the Tests
+
+### Prerequisites
+- Local backend running on `http://127.0.0.1:8000` (see Quick Start above)
+- Image file at `C:\Data\Shawshank.png` (used by the create-recommendation sanity test)
+- Admin account `hagai@svcollage.co.il` registered in the app
+
+### Install test dependencies
+```bash
+pip install pytest playwright pytest-playwright httpx
+playwright install chromium
+```
+
+### Run the sanity suite
+```bash
+# From the project root
+pytest tests/sanity/ -v
+```
+
+Run with a visible browser (useful for debugging):
+```bash
+pytest tests/sanity/ -v --headed
+```
+
+Run only sanity-marked tests:
+```bash
+pytest -m sanity -v
+```
+
+---
+
 ## Project Structure
 ```
 SV_Students_recommend/
@@ -87,5 +118,7 @@ SV_Students_recommend/
 │   ├── assets/      CSS, images
 │   ├── pages/       HTML pages
 │   └── js/          JavaScript modules
-└── supabase/        Database SQL setup script
+├── supabase/        Database SQL setup script
+└── tests/           Playwright + Pytest test suite
+    └── sanity/      Sanity / smoke tests
 ```
