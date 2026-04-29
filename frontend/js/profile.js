@@ -46,15 +46,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Non-critical — keep localStorage values
   }
 
-  // Delete account
-  document.getElementById('btnDeleteAccount').addEventListener('click', async () => {
-    const confirmed = window.confirm(
-      'Are you sure you want to permanently delete your account?\nThis action cannot be undone.'
-    );
-    if (!confirmed) return;
+  // Delete account — show inline confirmation panel
+  const confirmPanel  = document.getElementById('deleteConfirm');
+  const errEl         = document.getElementById('deleteError');
 
-    const btn = document.getElementById('btnDeleteAccount');
-    const errEl = document.getElementById('deleteError');
+  document.getElementById('btnDeleteAccount').addEventListener('click', () => {
+    confirmPanel.style.display = 'block';
+    errEl.style.display = 'none';
+  });
+
+  document.getElementById('btnCancelDelete').addEventListener('click', () => {
+    confirmPanel.style.display = 'none';
+  });
+
+  document.getElementById('btnConfirmDelete').addEventListener('click', async () => {
+    const btn = document.getElementById('btnConfirmDelete');
     btn.disabled = true;
     btn.textContent = 'Deleting…';
     errEl.style.display = 'none';
@@ -66,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       errEl.textContent = err.message || 'Failed to delete account. Please try again.';
       errEl.style.display = 'block';
       btn.disabled = false;
-      btn.textContent = 'Delete Account';
+      btn.textContent = 'Yes, delete my account';
     }
   });
 });

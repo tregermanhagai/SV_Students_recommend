@@ -73,8 +73,27 @@
         Delete Account
       </button>
     </div>
-    <div id="deleteError" data-test="delete-error"
-         style="margin-top:10px; color:var(--danger,#e53e3e); display:none"></div>
+
+    <!-- Inline confirmation — shown when Delete Account is clicked -->
+    <div id="deleteConfirm" data-test="delete-confirm"
+         style="display:none; margin-top:16px; padding:14px 16px; border:1.5px solid var(--danger,#e53e3e);
+                border-radius:8px; background:#fff5f5">
+      <p style="margin:0 0 12px; font-weight:600; color:var(--danger,#e53e3e)">
+        Are you sure? This will permanently delete your account and cannot be undone.
+      </p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap">
+        <button class="btn" id="btnConfirmDelete" data-test="btn-confirm-delete"
+                style="width:auto; padding:7px 20px; background:var(--danger,#e53e3e); color:#fff; border:none">
+          Yes, delete my account
+        </button>
+        <button class="btn btn-secondary" id="btnCancelDelete" data-test="btn-cancel-delete"
+                style="width:auto; padding:7px 20px">
+          Cancel
+        </button>
+      </div>
+      <div id="deleteError" data-test="delete-error"
+           style="margin-top:10px; color:var(--danger,#e53e3e); display:none"></div>
+    </div>
   </div>
 </main>
 
