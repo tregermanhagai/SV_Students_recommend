@@ -50,6 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!email)    return showError('Email is required.');
     if (password.length < 4) return showError('Password must be at least 4 characters.');
     if (!/^[\x20-\x7E]+$/.test(password)) return showError('Password must contain English characters only.');
+    if (/_/.test(email.split('@')[0]))
+      return showError('Email addresses with underscores are not supported. Please use a dot or remove the underscore (e.g. student1@… instead of student_1@…).');
 
     if (!skipCaptcha) {
       const given = parseInt(document.getElementById('captchaInput').value, 10);

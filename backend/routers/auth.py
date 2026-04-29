@@ -29,10 +29,14 @@ def register(body: UserRegister):
             }
         )
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
-        )
+        msg = str(e)
+        if "invalid" in msg.lower() and "email" in msg.lower():
+            msg = (
+                f"The email address '{body.email}' was rejected. "
+                "Please use a standard format without underscores or special characters "
+                "before the @ sign (e.g. student1@example.com)."
+            )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
 
     if not result.user:
         raise HTTPException(
