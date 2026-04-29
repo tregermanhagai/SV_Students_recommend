@@ -109,6 +109,11 @@ playwright install chromium
 ```
 
 ### Run the sanity suite
+
+The sanity suite automatically bypasses the registration CAPTCHA — no extra flag needed.
+The `RegisterPage` page object navigates to `register.html?skip_captcha=true` by default,
+so the CAPTCHA is hidden and skipped for all automated runs.
+
 ```bash
 # From the project root
 pytest tests/sanity/ -v
@@ -117,6 +122,17 @@ pytest tests/sanity/ -v
 Run with a visible browser (useful for debugging):
 ```bash
 pytest tests/sanity/ -v --headed
+```
+
+Run only sanity-marked tests across the full suite:
+```bash
+pytest -m sanity -v
+```
+
+To run a **single test**:
+```bash
+pytest tests/sanity/test_create_recommendation.py::test_admin_creates_recommendation -v
+pytest tests/sanity/test_create_recommendation.py::test_student_cannot_delete_others_recommendations -v
 ```
 
 Run only sanity-marked tests:
