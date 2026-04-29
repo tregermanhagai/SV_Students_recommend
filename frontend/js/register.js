@@ -1,10 +1,26 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Redirect if already logged in
   if (isLoggedIn()) {
     window.location.href = 'home.html';
     return;
   }
 
+  const params      = new URLSearchParams(window.location.search);
+  const skipCaptcha = params.get('skip_captcha') === 'true';
+
+  // ── CAPTCHA setup ─────────────────────────────────────────────
+  const captchaWrap = document.getElementById('captchaWrap');
+  let captchaAnswer = null;
+
+  if (skipCaptcha) {
+    captchaWrap.style.display = 'none';
+  } else {
+    const a = Math.floor(Math.random() * 9) + 1;
+    const b = Math.floor(Math.random() * 9) + 1;
+    captchaAnswer = a + b;
+    document.getElementById('captchaQuestion').textContent = `What is ${a} + ${b} ?`;
+  }
+
+  // ── Form wiring ───────────────────────────────────────────────
   const form       = document.getElementById('registerForm');
   const errorMsg   = document.getElementById('errorMsg');
   const successMsg = document.getElementById('successMsg');
@@ -35,6 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (password.length < 4) return showError('Password must be at least 4 characters.');
     if (!/^[\x20-\x7E]+$/.test(password)) return showError('Password must contain English characters only.');
 
+    if (!skipCaptcha) {
+      const given = parseInt(document.getElementById('captchaInput').value, 10);
+      if (isNaN(given) || given !== captchaAnswer) {
+        return showError('Incorrect answer to the security check. Please try again.');
+      }
+    }
+
     const btn = form.querySelector('[data-test="btn-register"]');
     btn.disabled = true;
     btn.textContent = 'Creating account…';
@@ -55,8 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btnGoogle.addEventListener('click', () => {
-    // Google OAuth — Supabase handles the redirect
-    // Requires SUPABASE_URL and SUPABASE_ANON to be set in api.js
     if (!SUPABASE_URL) {
       alert('Google login is not configured yet. Please contact your instructor.');
       return;

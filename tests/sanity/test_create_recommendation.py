@@ -13,7 +13,9 @@ import pytest
 import httpx
 from playwright.sync_api import Page, expect
 
-from settings import BASE_URL, ADMIN_EMAIL, ADMIN_PASSWORD
+from settings import BASE_URL, ADMIN_EMAIL, ADMIN_PASSWORD, SUPABASE_URL, SUPABASE_SERVICE_KEY
+from pages.login_page import LoginPage
+from pages.register_page import RegisterPage
 
 IMAGE_PATH = Path(r"C:\Data\Shawshank.png")
 
@@ -36,6 +38,13 @@ def _get_token() -> str:
     return resp.json()["access_token"]
 
 
+STUDENT_1 = {
+    "name":     "student_1",
+    "email":    "student1@svcollege.co.il",   # underscore not valid in Supabase email
+    "password": "test1234",
+}
+
+
 def _delete_existing(token: str) -> None:
     """Delete any existing recommendation with the same name."""
     headers = {"Authorization": f"Bearer {token}"}
@@ -43,6 +52,45 @@ def _delete_existing(token: str) -> None:
     for rec in recs:
         if rec["name"] == RECOMMENDATION["name"]:
             httpx.delete(f"{BASE_URL}/api/recommendations/{rec['id']}", headers=headers)
+
+
+def _supabase_headers() -> dict:
+    return {
+        "apikey":        SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+    }
+
+
+def _find_supabase_user(email: str) -> dict | None:
+    """Return the Supabase auth user dict for the given email, or None."""
+    resp = httpx.get(
+        f"{SUPABASE_URL}/auth/v1/admin/users",
+        headers=_supabase_headers(),
+        params={"page": 1, "per_page": 1000},
+    )
+    users = resp.json().get("users", [])
+    return next((u for u in users if u.get("email") == email), None)
+
+
+def _delete_user_by_email(email: str) -> None:
+    """Delete a Supabase Auth user by email using the service-role admin API."""
+    user = _find_supabase_user(email)
+    if user:
+        httpx.delete(
+            f"{SUPABASE_URL}/auth/v1/admin/users/{user['id']}",
+            headers=_supabase_headers(),
+        )
+
+
+def _confirm_email(email: str) -> None:
+    """Confirm a user's email via the Supabase admin API."""
+    user = _find_supabase_user(email)
+    if user:
+        httpx.put(
+            f"{SUPABASE_URL}/auth/v1/admin/users/{user['id']}",
+            headers=_supabase_headers(),
+            json={"email_confirm": True},
+        )
 
 
 @pytest.mark.sanity
@@ -103,3 +151,52 @@ def test_admin_creates_recommendation(page: Page):
     comment = page.get_by_test_id("comment-item").first
     expect(comment).to_be_visible(timeout=8_000)
     expect(page.get_by_test_id("comment-text").first).to_have_text("Amazing movie, highly recommended!")
+
+
+@pytest.mark.sanity
+def test_student_cannot_delete_others_recommendations(page: Page):
+    # ── Precondition: delete student_1 if already exists ─────────
+    _delete_user_by_email(STUDENT_1["email"])
+
+    # ── Step 1: Register student_1 via UI ────────────────────────
+    register_page = RegisterPage(page)
+    register_page.goto()
+    register_page.register(STUDENT_1["name"], STUDENT_1["email"], STUDENT_1["password"])
+
+    # Confirm email via admin API (Supabase requires confirmation before first login)
+    _confirm_email(STUDENT_1["email"])
+
+    # ── Step 2: Login as student_1 ────────────────────────────────
+    login_page = LoginPage(page)
+    login_page.login(STUDENT_1["email"], STUDENT_1["password"])
+
+    # ── Step 3: Get admin's recommendation ID via API ─────────────
+    recs = httpx.get(f"{BASE_URL}/api/recommendations").json()
+    admin_rec = next((r for r in recs if r["name"] == RECOMMENDATION["name"]), None)
+    assert admin_rec, f"Admin recommendation '{RECOMMENDATION['name']}' not found — run the first test first."
+
+    # ── Step 4: Open recommendation detail page ───────────────────
+    page.goto(f"{BASE_URL}/pages/recommendation-detail.html?id={admin_rec['id']}")
+    expect(page.get_by_test_id("detail-title")).to_have_text(RECOMMENDATION["name"], timeout=8_000)
+
+    # ── Step 5: Verify delete button is NOT visible for student_1 ─
+    expect(page.get_by_test_id("btn-delete-recommendation")).not_to_be_visible()
+
+    # ── Step 6: Verify API also rejects DELETE with 403 ───────────
+    student_token = httpx.post(
+        f"{BASE_URL}/auth/login",
+        json={"email": STUDENT_1["email"], "password": STUDENT_1["password"]},
+    ).json()["access_token"]
+
+    api_resp = httpx.delete(
+        f"{BASE_URL}/api/recommendations/{admin_rec['id']}",
+        headers={"Authorization": f"Bearer {student_token}"},
+    )
+    assert api_resp.status_code == 403, (
+        f"Expected 403 Forbidden but got {api_resp.status_code}: {api_resp.text}"
+    )
+
+    # ── Step 7: Logout ────────────────────────────────────────────
+    login_page.logout()
+
+    # student_1 is intentionally left in the system for manual testing

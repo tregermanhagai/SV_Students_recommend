@@ -79,6 +79,22 @@ const SUPABASE_ANON = 'your-anon-key';
 
 Full interactive docs at `/docs` (Swagger UI).
 
+## Registration CAPTCHA
+
+The registration page includes a simple **math CAPTCHA** (e.g. *"What is 4 + 7?"*) to reduce bot sign-ups.
+
+### Bypass flag — `?skip_captcha=true`
+
+Add `?skip_captcha=true` to the registration URL to hide the CAPTCHA field and skip validation entirely:
+
+```
+http://localhost:8000/pages/register.html?skip_captcha=true
+```
+
+This flag is intended for **automated testing only**. The Playwright `RegisterPage` page object uses it by default (`skip_captcha=True`). To test the CAPTCHA itself, call `register_page.goto(skip_captcha=False)`.
+
+---
+
 ## Running the Tests
 
 ### Prerequisites
