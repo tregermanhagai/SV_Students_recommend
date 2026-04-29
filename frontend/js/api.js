@@ -7,8 +7,8 @@
  */
 const BASE_URL = '';   // e.g. 'https://sv-students-recommend.onrender.com' in production
 
-const SUPABASE_URL  = '';   // e.g. 'https://xyz.supabase.co'
-const SUPABASE_ANON = '';   // Supabase anon/public key (safe to expose in browser)
+const SUPABASE_URL  = 'https://yxouogpqibndejycvztf.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4b3VvZ3BxaWJuZGVqeWN2enRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTExMTUsImV4cCI6MjA5Mjk2NzExNX0.cgVlUqpM1DVcgJVSbZiXZESZv_1BUhNBQbbkRdgABcg';
 
 /**
  * apiFetch — wraps fetch with:
