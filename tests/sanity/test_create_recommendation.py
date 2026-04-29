@@ -22,6 +22,7 @@ RECOMMENDATION = {
     "name":         "The Shawshank Redemption 2",
     "student_name": "hagai",
     "url":          "https://www.imdb.com/title/tt0111161/?ref_=mv_close",
+    "description":  "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
 }
 
 
@@ -68,6 +69,7 @@ def test_admin_creates_recommendation(page: Page):
     page.get_by_test_id("input-recommendation-name").fill(RECOMMENDATION["name"])
     page.get_by_test_id("input-recommender-name").fill(RECOMMENDATION["student_name"])
     page.get_by_test_id("input-website-link").fill(RECOMMENDATION["url"])
+    page.get_by_test_id("textarea-description").fill(RECOMMENDATION["description"])
 
     assert IMAGE_PATH.exists(), f"Image not found: {IMAGE_PATH}"
     page.get_by_test_id("input-image").set_input_files(str(IMAGE_PATH))
