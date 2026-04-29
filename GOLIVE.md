@@ -114,6 +114,14 @@ Work through this list locally before deploying.
 - [ ] `DELETE /api/recommendations/{id}` deletes own record
 - [ ] `PUT`/`DELETE` on another user's record returns 403
 
+### Store (new flow)
+- [ ] Open Store from header nav and verify both products render
+- [ ] Select T-Shirt → cart shows unit price 50 NIS and requires size before payment
+- [ ] Change quantity in cart and confirm total updates correctly
+- [ ] Select Cup → cart hides size selector and allows continue
+- [ ] Payment form blocks invalid card, CVV, and expired month
+- [ ] Valid payment submission shows success message and clears `sv_cart`
+
 ---
 
 ## Phase 3 — Go Live on Render

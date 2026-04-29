@@ -1,66 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Store - SV Students Recommend</title>
-  <link rel="stylesheet" href="../assets/style.css" />
-  <link rel="icon" href="../assets/SVCollege_logo.png" type="image/png" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Store - SV Students Recommend</title>
+    <link rel="stylesheet" href="../assets/style.css" />
+    <link rel="icon" href="../assets/SVCollege_logo.png" type="image/png" />
 </head>
+
 <body>
 
-<header class="global-header">
-  <a class="header-logo" href="home.html">
-    <img src="../assets/SVCollege_logo.png" alt="SV College" data-test="logo-svcollege" />
-    <span>SV Recommend</span>
-  </a>
-  <nav class="header-nav">
-    <a class="nav-link" href="home.html" data-test="nav-home">Home</a>
-    <a class="nav-link" href="profile.html" data-test="nav-profile">My Profile</a>
-    <a class="nav-link" href="#" id="btnLogout" data-test="nav-logout">Logout</a>
-    <a class="btn-accent" href="add-recommendation.html" data-test="nav-signup-recommendations">+ Add Recommendation</a>
-  </nav>
-</header>
+    <header class="global-header">
+        <a class="header-logo" href="home.html">
+            <img src="../assets/SVCollege_logo.png" alt="SV College" data-test="logo-svcollege" />
+            <span>SV Recommend</span>
+        </a>
+        <nav class="header-nav">
+            <a class="nav-link" href="home.html" data-test="nav-home">Home</a>
+            <a class="nav-link" href="profile.html" data-test="nav-profile">My Profile</a>
+            <a class="nav-link" href="#" id="btnLogout" data-test="nav-logout">Logout</a>
+            <a class="btn-accent" href="add-recommendation.html" data-test="nav-signup-recommendations">+ Add
+                Recommendation</a>
+        </nav>
+    </header>
 
-<main class="container" data-test="section-store">
-  <h2 style="color:var(--primary)">SV College Store</h2>
-  <p style="margin-top:6px;color:var(--text-muted)">Practice checkout flow for branded college merchandise.</p>
+    <main class="container" data-test="section-store">
+        <h2 style="color:var(--primary)">SV College Store</h2>
+        <p style="margin-top:6px;color:var(--text-muted)">Practice checkout flow for branded college merchandise.</p>
 
-  <section class="product-grid" style="margin-top:20px">
-    <article class="product-card card" data-test="product-card-tshirt">
-      <div class="product-img-wrap card-image-wrap" aria-hidden="true">
-        <svg width="96" height="96" viewBox="0 0 120 120" fill="none">
-          <path d="M36 28l10-10h28l10 10 16 5-6 20-10-3v52H26V50l-10 3-6-20 16-5z" fill="#dfe6ee" stroke="#8ea0b4" stroke-width="3"/>
-          <circle cx="60" cy="58" r="13" fill="#f5a623"/>
-          <text x="60" y="62" text-anchor="middle" font-size="8" fill="#1a3c5e" font-family="Arial">SV</text>
-        </svg>
-      </div>
-      <div class="product-card-body card-body">
-        <h3 class="product-name card-title">T-Shirt with SV College Logo</h3>
-        <div class="price-badge">50 NIS</div>
-        <button class="btn btn-primary" type="button" data-test="btn-select-tshirt" data-product="tshirt">Select</button>
-      </div>
-    </article>
+        <section class="product-grid" style="margin-top:20px">
+            <article class="product-card card" data-test="product-card-tshirt">
+                <div class="product-img-wrap card-image-wrap" aria-hidden="true">
+                    <svg width="96" height="96" viewBox="0 0 120 120" fill="none">
+                        <path d="M36 28l10-10h28l10 10 16 5-6 20-10-3v52H26V50l-10 3-6-20 16-5z" fill="#dfe6ee"
+                            stroke="#8ea0b4" stroke-width="3" />
+                        <circle cx="60" cy="58" r="13" fill="#f5a623" />
+                        <text x="60" y="62" text-anchor="middle" font-size="8" fill="#1a3c5e"
+                            font-family="Arial">SV</text>
+                    </svg>
+                </div>
+                <div class="product-card-body card-body">
+                    <h3 class="product-name card-title">T-Shirt with SV College Logo</h3>
+                    <div class="price-badge">50 NIS</div>
+                    <button class="btn btn-primary" type="button" data-test="btn-select-tshirt"
+                        data-product="tshirt">Select</button>
+                </div>
+            </article>
 
-    <article class="product-card card" data-test="product-card-cup">
-      <div class="product-img-wrap card-image-wrap" aria-hidden="true">
-        <svg width="96" height="96" viewBox="0 0 120 120" fill="none">
-          <rect x="28" y="34" width="50" height="58" rx="6" fill="#dfe6ee" stroke="#8ea0b4" stroke-width="3"/>
-          <path d="M78 44h8c8 0 14 6 14 14s-6 14-14 14h-8" stroke="#8ea0b4" stroke-width="3" fill="none"/>
-          <circle cx="52" cy="62" r="13" fill="#f5a623"/>
-          <text x="52" y="66" text-anchor="middle" font-size="8" fill="#1a3c5e" font-family="Arial">SV</text>
-        </svg>
-      </div>
-      <div class="product-card-body card-body">
-        <h3 class="product-name card-title">Cup with SV College Logo</h3>
-        <div class="price-badge">20 NIS</div>
-        <button class="btn btn-primary" type="button" data-test="btn-select-cup" data-product="cup">Select</button>
-      </div>
-    </article>
-  </section>
-</main>
+            <article class="product-card card" data-test="product-card-cup">
+                <div class="product-img-wrap card-image-wrap" aria-hidden="true">
+                    <svg width="96" height="96" viewBox="0 0 120 120" fill="none">
+                        <rect x="28" y="34" width="50" height="58" rx="6" fill="#dfe6ee" stroke="#8ea0b4"
+                            stroke-width="3" />
+                        <path d="M78 44h8c8 0 14 6 14 14s-6 14-14 14h-8" stroke="#8ea0b4" stroke-width="3"
+                            fill="none" />
+                        <circle cx="52" cy="62" r="13" fill="#f5a623" />
+                        <text x="52" y="66" text-anchor="middle" font-size="8" fill="#1a3c5e"
+                            font-family="Arial">SV</text>
+                    </svg>
+                </div>
+                <div class="product-card-body card-body">
+                    <h3 class="product-name card-title">Cup with SV College Logo</h3>
+                    <div class="price-badge">20 NIS</div>
+                    <button class="btn btn-primary" type="button" data-test="btn-select-cup"
+                        data-product="cup">Select</button>
+                </div>
+            </article>
+        </section>
+    </main>
 
-<script src="../js/auth.js"></script>
-<script src="../js/store.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/store.js"></script>
 </body>
+
 </html>

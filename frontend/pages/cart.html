@@ -1,72 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cart - SV Students Recommend</title>
-  <link rel="stylesheet" href="../assets/style.css" />
-  <link rel="icon" href="../assets/SVCollege_logo.png" type="image/png" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cart - SV Students Recommend</title>
+    <link rel="stylesheet" href="../assets/style.css" />
+    <link rel="icon" href="../assets/SVCollege_logo.png" type="image/png" />
 </head>
+
 <body>
 
-<header class="global-header">
-  <a class="header-logo" href="home.html">
-    <img src="../assets/SVCollege_logo.png" alt="SV College" data-test="logo-svcollege" />
-    <span>SV Recommend</span>
-  </a>
-  <nav class="header-nav">
-    <a class="nav-link" href="home.html" data-test="nav-home">Home</a>
-    <a class="nav-link" href="profile.html" data-test="nav-profile">My Profile</a>
-    <a class="nav-link" href="#" id="btnLogout" data-test="nav-logout">Logout</a>
-    <a class="btn-accent" href="add-recommendation.html" data-test="nav-signup-recommendations">+ Add Recommendation</a>
-  </nav>
-</header>
+    <header class="global-header">
+        <a class="header-logo" href="home.html">
+            <img src="../assets/SVCollege_logo.png" alt="SV College" data-test="logo-svcollege" />
+            <span>SV Recommend</span>
+        </a>
+        <nav class="header-nav">
+            <a class="nav-link" href="home.html" data-test="nav-home">Home</a>
+            <a class="nav-link" href="profile.html" data-test="nav-profile">My Profile</a>
+            <a class="nav-link" href="#" id="btnLogout" data-test="nav-logout">Logout</a>
+            <a class="btn-accent" href="add-recommendation.html" data-test="nav-signup-recommendations">+ Add
+                Recommendation</a>
+        </nav>
+    </header>
 
-<main class="container">
-  <div class="page-card cart-box">
-    <h2>Your Cart</h2>
+    <main class="container">
+        <div class="page-card cart-box">
+            <h2>Your Cart</h2>
 
-    <div class="alert alert-error" id="cartError"></div>
+            <div class="alert alert-error" id="cartError"></div>
 
-    <section class="cart-product-summary">
-      <div class="card-meta">Product</div>
-      <div id="cartProductName" style="font-weight:700; margin-top:2px" data-test="cart-product-name">-</div>
-      <div id="cartUnitPrice" style="margin-top:4px; color:var(--text-muted)">-</div>
-    </section>
+            <section class="cart-product-summary">
+                <div class="card-meta">Product</div>
+                <div id="cartProductName" style="font-weight:700; margin-top:2px" data-test="cart-product-name">-</div>
+                <div id="cartUnitPrice" style="margin-top:4px; color:var(--text-muted)">-</div>
+            </section>
 
-    <div class="form-group">
-      <label>Quantity</label>
-      <div class="qty-stepper">
-        <button type="button" id="btnQtyMinus" aria-label="Decrease quantity" data-test="btn-qty-minus">-</button>
-        <div class="qty-display" id="cartQuantity" data-test="cart-quantity">1</div>
-        <button type="button" id="btnQtyPlus" aria-label="Increase quantity" data-test="btn-qty-plus">+</button>
-      </div>
-    </div>
+            <div class="form-group">
+                <label>Quantity</label>
+                <div class="qty-stepper">
+                    <button type="button" id="btnQtyMinus" aria-label="Decrease quantity"
+                        data-test="btn-qty-minus">-</button>
+                    <div class="qty-display" id="cartQuantity" data-test="cart-quantity">1</div>
+                    <button type="button" id="btnQtyPlus" aria-label="Increase quantity"
+                        data-test="btn-qty-plus">+</button>
+                </div>
+            </div>
 
-    <div class="form-group" id="sizeSelector" style="display:none">
-      <label>Size</label>
-      <div class="size-group">
-        <button type="button" class="size-btn" data-size="S" data-test="btn-size-s">S</button>
-        <button type="button" class="size-btn" data-size="M" data-test="btn-size-m">M</button>
-        <button type="button" class="size-btn" data-size="L" data-test="btn-size-l">L</button>
-      </div>
-    </div>
+            <div class="form-group" id="sizeSelector" style="display:none">
+                <label>Size</label>
+                <div class="size-group">
+                    <button type="button" class="size-btn" data-size="S" data-test="btn-size-s">S</button>
+                    <button type="button" class="size-btn" data-size="M" data-test="btn-size-m">M</button>
+                    <button type="button" class="size-btn" data-size="L" data-test="btn-size-l">L</button>
+                </div>
+            </div>
 
-    <div class="order-summary-box" style="margin-top:18px">
-      <div class="order-row total">
-        <span>Total</span>
-        <strong id="cartTotal" data-test="cart-total">0 NIS</strong>
-      </div>
-    </div>
+            <div class="order-summary-box" style="margin-top:18px">
+                <div class="order-row total">
+                    <span>Total</span>
+                    <strong id="cartTotal" data-test="cart-total">0 NIS</strong>
+                </div>
+            </div>
 
-    <div class="form-actions" style="margin-top:6px">
-      <a href="store.html" class="btn btn-secondary" style="width:auto" data-test="link-back-store">&larr; Back to Store</a>
-      <button type="button" class="btn btn-primary" id="btnProceedPayment" data-test="btn-proceed-payment">Proceed to Payment</button>
-    </div>
-  </div>
-</main>
+            <div class="form-actions" style="margin-top:6px">
+                <a href="store.html" class="btn btn-secondary" style="width:auto" data-test="link-back-store">&larr;
+                    Back to Store</a>
+                <button type="button" class="btn btn-primary" id="btnProceedPayment"
+                    data-test="btn-proceed-payment">Proceed to Payment</button>
+            </div>
+        </div>
+    </main>
 
-<script src="../js/auth.js"></script>
-<script src="../js/cart.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/cart.js"></script>
 </body>
+
 </html>
