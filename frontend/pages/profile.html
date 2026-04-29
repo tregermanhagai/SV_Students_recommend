@@ -64,11 +64,17 @@
       </p>
     </div>
 
-    <div style="margin-top:20px">
+    <div style="margin-top:20px; display:flex; gap:12px; align-items:center; flex-wrap:wrap">
       <button class="btn btn-secondary" id="btnLogoutBottom" data-test="btn-logout" style="width:auto; padding:8px 24px">
         Logout
       </button>
+      <button class="btn" id="btnDeleteAccount" data-test="btn-delete-account"
+              style="width:auto; padding:8px 24px; background:var(--danger,#e53e3e); color:#fff; border:none">
+        Delete Account
+      </button>
     </div>
+    <div id="deleteError" data-test="delete-error"
+         style="margin-top:10px; color:var(--danger,#e53e3e); display:none"></div>
   </div>
 </main>
 

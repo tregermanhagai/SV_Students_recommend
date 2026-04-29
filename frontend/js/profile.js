@@ -45,4 +45,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (_) {
     // Non-critical — keep localStorage values
   }
+
+  // Delete account
+  document.getElementById('btnDeleteAccount').addEventListener('click', async () => {
+    const confirmed = window.confirm(
+      'Are you sure you want to permanently delete your account?\nThis action cannot be undone.'
+    );
+    if (!confirmed) return;
+
+    const btn = document.getElementById('btnDeleteAccount');
+    const errEl = document.getElementById('deleteError');
+    btn.disabled = true;
+    btn.textContent = 'Deleting…';
+    errEl.style.display = 'none';
+
+    try {
+      await apiFetch('/api/profile/me', { method: 'DELETE' });
+      logout();
+    } catch (err) {
+      errEl.textContent = err.message || 'Failed to delete account. Please try again.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Delete Account';
+    }
+  });
 });

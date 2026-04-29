@@ -1,4 +1,6 @@
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, status, Header
+from config import get_settings
 from services.supabase_client import get_supabase
 from dependencies import get_current_user
 
@@ -20,6 +22,29 @@ def get_profile(current_user: dict = Depends(get_current_user)):
         "email": current_user["email"],
         "name": name,
     }
+
+
+@router.delete(
+    "/profile/me",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete your own account",
+)
+def delete_profile(current_user: dict = Depends(get_current_user)):
+    """Permanently deletes the authenticated user's account and profile."""
+    settings = get_settings()
+    user_id = current_user["id"]
+    resp = httpx.delete(
+        f"{settings.supabase_url}/auth/v1/admin/users/{user_id}",
+        headers={
+            "apikey":        settings.supabase_service_key,
+            "Authorization": f"Bearer {settings.supabase_service_key}",
+        },
+    )
+    if resp.status_code not in (200, 204):
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to delete account. Please try again.",
+        )
 
 
 @router.get(
