@@ -100,7 +100,7 @@ This flag is intended for **automated testing only**. The Playwright `RegisterPa
 ### Prerequisites
 - Local backend running on `http://127.0.0.1:8000` (see Quick Start above)
 - Image file at `C:\Data\Shawshank.png` (used by the create-recommendation sanity test)
-- Admin account `hagai@svcollage.co.il` registered in the app
+- Admin account `hagai@svcollege.co.il` registered in the app
 
 ### Install test dependencies
 ```bash

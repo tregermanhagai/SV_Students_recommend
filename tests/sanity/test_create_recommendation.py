@@ -15,7 +15,6 @@ from playwright.sync_api import Page, expect
 
 from settings import BASE_URL, ADMIN_EMAIL, ADMIN_PASSWORD, SUPABASE_URL, SUPABASE_SERVICE_KEY
 from pages.login_page import LoginPage
-from pages.register_page import RegisterPage
 
 IMAGE_PATH = Path(r"C:\Data\Shawshank.png")
 
@@ -82,15 +81,23 @@ def _delete_user_by_email(email: str) -> None:
         )
 
 
-def _confirm_email(email: str) -> None:
-    """Confirm a user's email via the Supabase admin API."""
-    user = _find_supabase_user(email)
-    if user:
-        httpx.put(
-            f"{SUPABASE_URL}/auth/v1/admin/users/{user['id']}",
-            headers=_supabase_headers(),
-            json={"email_confirm": True},
-        )
+def _create_student_via_admin(student: dict) -> None:
+    """Create a user directly via Supabase admin API.
+
+    Using the admin API avoids triggering a confirmation email, which sidesteps
+    Supabase's per-address email rate limit that fires when the same address is
+    registered repeatedly during test runs.
+    """
+    httpx.post(
+        f"{SUPABASE_URL}/auth/v1/admin/users",
+        headers=_supabase_headers(),
+        json={
+            "email":         student["email"],
+            "password":      student["password"],
+            "email_confirm": True,
+            "user_metadata": {"full_name": student["name"]},
+        },
+    )
 
 
 @pytest.mark.sanity
@@ -158,16 +165,12 @@ def test_student_cannot_delete_others_recommendations(page: Page):
     # ── Precondition: delete student_1 if already exists ─────────
     _delete_user_by_email(STUDENT_1["email"])
 
-    # ── Step 1: Register student_1 via UI ────────────────────────
-    register_page = RegisterPage(page)
-    register_page.goto()
-    register_page.register(STUDENT_1["name"], STUDENT_1["email"], STUDENT_1["password"])
+    # ── Step 1: Create student_1 via admin API (no email sent → no rate limit)
+    _create_student_via_admin(STUDENT_1)
 
-    # Confirm email via admin API (Supabase requires confirmation before first login)
-    _confirm_email(STUDENT_1["email"])
-
-    # ── Step 2: Login as student_1 ────────────────────────────────
+    # ── Step 2: Login as student_1 via UI ────────────────────────
     login_page = LoginPage(page)
+    login_page.goto()
     login_page.login(STUDENT_1["email"], STUDENT_1["password"])
 
     # ── Step 3: Get admin's recommendation ID via API ─────────────
