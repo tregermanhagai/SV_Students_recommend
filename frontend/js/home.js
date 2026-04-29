@@ -1,4 +1,22 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // ── Handle Google OAuth callback ──────────────────────────────
+  // Supabase redirects here with #access_token=... in the fragment
+  const fragment   = new URLSearchParams(window.location.hash.slice(1));
+  const oauthToken = fragment.get('access_token');
+  if (oauthToken) {
+    // Remove the token from the URL bar immediately
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+    localStorage.setItem('sv_token', oauthToken);
+    try {
+      const profile = await apiFetch('/api/profile/me');
+      saveSession({ access_token: oauthToken, id: profile.id, name: profile.name, email: profile.email });
+    } catch {
+      clearSession();
+      window.location.href = '/pages/login.html';
+      return;
+    }
+  }
+
   requireAuth();
 
   const grid        = document.getElementById('recommendationGrid');
