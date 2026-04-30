@@ -24,10 +24,16 @@ function requireAuth() {
 function saveSession(data) {
   localStorage.setItem('sv_token', data.access_token);
   localStorage.setItem('sv_user', JSON.stringify({
-    id:    data.id,
-    name:  data.name,
-    email: data.email,
+    id:       data.id,
+    name:     data.name,
+    email:    data.email,
+    is_admin: data.is_admin || false,
   }));
+}
+
+function isAdmin() {
+  const user = getUser();
+  return !!(user && user.is_admin);
 }
 
 function logout() {

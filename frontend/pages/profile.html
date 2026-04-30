@@ -90,6 +90,16 @@
       </p>
     </div>
 
+    <!-- Admin panel link — hidden until JS confirms is_admin -->
+    <div id="adminPanelSection" style="display:none; margin-top:20px">
+      <hr style="border:none; border-top:1.5px solid var(--border); margin-bottom:20px" />
+      <h3 style="margin-bottom:10px">Administration</h3>
+      <a href="admin.html" class="btn btn-primary" id="adminPanelLink" data-test="link-admin-panel"
+         style="width:auto; display:inline-block; padding:8px 24px">
+        <i class="fas fa-shield-halved" style="margin-right:6px"></i>User Management
+      </a>
+    </div>
+
     <div style="margin-top:20px; display:flex; gap:12px; align-items:center; flex-wrap:wrap">
       <button class="btn btn-secondary" id="btnLogoutBottom" data-test="btn-logout" style="width:auto; padding:8px 24px">
         Logout

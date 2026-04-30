@@ -64,6 +64,12 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
+      // Save token first so apiFetch can use it for the profile request
+      localStorage.setItem('sv_token', data.access_token);
+      try {
+        const profile = await apiFetch('/api/profile/me');
+        data.is_admin = profile.is_admin || false;
+      } catch { /* non-critical */ }
       saveSession(data);
       window.location.href = 'home.html';
     } catch (err) {

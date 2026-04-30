@@ -5,7 +5,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from config import get_settings
-from routers import auth, recommendations, comments, profile
+from routers import auth, recommendations, comments, profile, admin
 
 settings = get_settings()
 
@@ -31,6 +31,7 @@ app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(recommendations.router, prefix="/api", tags=["Recommendations"])
 app.include_router(comments.router, prefix="/api", tags=["Comments"])
 app.include_router(profile.router, prefix="/api", tags=["Profile"])
+app.include_router(admin.router,  prefix="/api", tags=["Admin"])
 
 @app.get("/", include_in_schema=False)
 def root():

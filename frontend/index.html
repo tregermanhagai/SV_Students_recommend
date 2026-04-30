@@ -31,12 +31,27 @@
           var name    = meta.full_name || meta.name || payload.email || '';
 
           localStorage.setItem('sv_token', params.access_token);
-          localStorage.setItem('sv_user', JSON.stringify({
-            id:    payload.sub,
-            name:  name,
-            email: payload.email || '',
-          }));
-          window.location.replace('/pages/home.html');
+          // Fetch profile to get is_admin, then redirect
+          fetch('/api/profile/me', {
+            headers: { 'Authorization': 'Bearer ' + params.access_token }
+          })
+            .then(function(r) { return r.ok ? r.json() : null; })
+            .then(function(profile) {
+              localStorage.setItem('sv_user', JSON.stringify({
+                id:       payload.sub,
+                name:     name,
+                email:    payload.email || '',
+                is_admin: (profile && profile.is_admin) || false,
+              }));
+            })
+            .catch(function() {
+              localStorage.setItem('sv_user', JSON.stringify({
+                id: payload.sub, name: name, email: payload.email || '', is_admin: false,
+              }));
+            })
+            .finally(function() {
+              window.location.replace('/pages/home.html');
+            });
         } catch (e) {
           window.location.replace('/pages/login.html');
         }

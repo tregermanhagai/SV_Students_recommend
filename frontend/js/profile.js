@@ -105,6 +105,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (profile) {
       document.getElementById('profileName').textContent  = profile.name  || user?.name  || '—';
       document.getElementById('profileEmail').textContent = profile.email || user?.email || '—';
+      // Keep is_admin in sync with what the server reports
+      const stored = getUser();
+      if (stored) {
+        stored.is_admin = profile.is_admin || false;
+        localStorage.setItem('sv_user', JSON.stringify(stored));
+      }
+      if (profile.is_admin) {
+        document.getElementById('adminPanelSection').style.display = 'block';
+      }
     }
   }).catch(() => {});
 });

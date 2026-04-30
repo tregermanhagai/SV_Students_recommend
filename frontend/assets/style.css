@@ -853,3 +853,57 @@ textarea.form-control { resize: vertical; min-height: 90px; }
   .form-actions { flex-direction: column; }
   .detail-actions { flex-direction: column; }
 }
+
+/* ── Admin Table ─────────────────────────────────────────────── */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.admin-table th {
+  text-align: left;
+  padding: 10px 14px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.admin-table tr:last-child td { border-bottom: none; }
+.admin-table tr:hover td { background: var(--bg); }
+
+.badge-active {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: #d4edda;
+  color: #155724;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.badge-banned {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: #f8d7da;
+  color: #721c24;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.btn-sm {
+  padding: 5px 14px;
+  font-size: 0.82rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font);
+  white-space: nowrap;
+}

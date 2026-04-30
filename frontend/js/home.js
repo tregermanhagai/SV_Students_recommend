@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     localStorage.setItem('sv_token', oauthToken);
     try {
       const profile = await apiFetch('/api/profile/me');
-      saveSession({ access_token: oauthToken, id: profile.id, name: profile.name, email: profile.email });
+      saveSession({ access_token: oauthToken, id: profile.id, name: profile.name, email: profile.email, is_admin: profile.is_admin || false });
     } catch {
       clearSession();
       window.location.href = '/pages/login.html';

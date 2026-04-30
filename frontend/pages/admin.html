@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Management – SV Students Recommend</title>
+  <link rel="stylesheet" href="../assets/style.css?v=2" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="icon" href="../assets/SVCollege_logo.png" type="image/png" />
+</head>
+<body>
+
+<!-- Global Header -->
+<header class="global-header">
+  <a class="header-logo" href="home.html">
+    <img src="../assets/SVCollege_logo.png" alt="SV College" data-test="logo-svcollege" />
+    <span>SV Recommend</span>
+  </a>
+  <nav class="header-nav">
+    <a class="nav-link" href="home.html"    data-test="nav-home">Home</a>
+    <a class="nav-link" href="profile.html" data-test="nav-profile">My Profile</a>
+    <a class="nav-link" href="#" id="btnLogout" data-test="nav-logout">Logout</a>
+  </nav>
+</header>
+
+<main class="container">
+  <div class="page-card">
+    <h2 style="margin-bottom:6px">
+      <i class="fas fa-shield-halved" style="margin-right:8px; color:var(--primary)"></i>User Management
+    </h2>
+    <p style="color:var(--text-muted); margin-bottom:24px; font-size:0.9rem">
+      Ban or unban users. Banned users cannot log in.
+    </p>
+
+    <!-- Loading / error -->
+    <div id="adminLoading" data-test="admin-loading" style="text-align:center; padding:40px 0">
+      <div class="spinner"></div>
+      <p>Loading users…</p>
+    </div>
+    <div id="adminError" data-test="admin-error"
+         style="display:none; color:var(--danger); text-align:center; padding:24px"></div>
+
+    <!-- User table -->
+    <div id="adminTableWrap" style="display:none; overflow-x:auto">
+      <table class="admin-table" data-test="admin-user-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="adminUserRows"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- Confirm ban/unban modal -->
+<div class="modal-overlay" id="confirmModal" data-test="modal-confirm-ban">
+  <div class="modal">
+    <button class="modal-close" id="closeConfirmModal" aria-label="Close">✕</button>
+    <h3 id="confirmTitle">Confirm action</h3>
+    <p id="confirmBody"></p>
+    <div style="display:flex; gap:10px; margin-top:20px; justify-content:flex-end">
+      <button class="btn btn-secondary" id="cancelConfirm" data-test="btn-cancel-ban">Cancel</button>
+      <button class="btn" id="doConfirm" data-test="btn-confirm-ban"
+              style="width:auto; padding:8px 20px; background:var(--danger); color:#fff; border:none">
+        Confirm
+      </button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer" data-test="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="https://svcollege.co.il/" target="_blank" rel="noopener noreferrer">
+        <img src="../assets/SVCollege_logo.png" alt="SV College" class="footer-logo-img" />
+      </a>
+      <span>SV College</span>
+    </div>
+    <p class="footer-copy">&copy; 2026 All rights reserved.</p>
+    <a href="../accessibility.html" class="footer-accessibility" title="Accessibility Statement" data-test="link-accessibility">
+      <i class="fas fa-universal-access"></i>
+      <span>Accessibility</span>
+    </a>
+  </div>
+</footer>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin.js"></script>
+</body>
+</html>

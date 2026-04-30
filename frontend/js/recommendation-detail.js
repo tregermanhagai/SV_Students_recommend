@@ -44,13 +44,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     wrap.style.display = 'inline';
   }
 
-  // Show owner actions if this is the user's recommendation
+  // Show owner actions if this is the user's recommendation or if the user is an admin
   const user = getUser();
-  if (user && user.id === rec.created_by) {
+  if (user && (user.id === rec.created_by || user.is_admin)) {
     const ownerActions = document.getElementById('ownerActions');
     ownerActions.style.display = 'flex';
 
-    document.getElementById('btnEdit').href = `add-recommendation.html?edit=${rec.id}`;
+    if (user.id === rec.created_by) {
+      document.getElementById('btnEdit').href = `add-recommendation.html?edit=${rec.id}`;
+    } else {
+      document.getElementById('btnEdit').style.display = 'none';
+    }
 
     document.getElementById('btnDelete').addEventListener('click', () => {
       deleteModal.classList.add('visible');

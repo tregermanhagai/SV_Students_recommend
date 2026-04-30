@@ -19,9 +19,10 @@ def get_profile(current_user: dict = Depends(get_current_user)):
     rows = profile.data or []
     name = rows[0]["name"] if rows else current_user.get("email", "")
     return {
-        "id": current_user["id"],
-        "email": current_user["email"],
-        "name": name,
+        "id":       current_user["id"],
+        "email":    current_user["email"],
+        "name":     name,
+        "is_admin": bool(rows[0].get("is_admin")) if rows else False,
     }
 
 
