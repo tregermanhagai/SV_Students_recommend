@@ -4,6 +4,19 @@ A practice sandbox application for SV College students to learn:
 - **End-to-end (E2E) testing** using Playwright, Python, and Pytest
 - **REST API testing** using Bearer token authentication
 
+## Production
+
+**Live URL:** https://sv-students-recommend.onrender.com/
+
+| Page | URL |
+|------|-----|
+| Login | https://sv-students-recommend.onrender.com/pages/login.html |
+| Home feed | https://sv-students-recommend.onrender.com/pages/home.html |
+| API docs (Swagger) | https://sv-students-recommend.onrender.com/docs |
+| Accessibility statement | https://sv-students-recommend.onrender.com/accessibility.html |
+
+---
+
 ## Demo Account
 
 | Field    | Value                    |
@@ -108,6 +121,16 @@ pip install pytest playwright pytest-playwright httpx
 playwright install chromium
 ```
 
+### What the sanity suite covers
+
+| # | Test | What it verifies |
+|---|------|-----------------|
+| 1 | `test_admin_creates_recommendation` | Admin logs in via UI · navigates to Add Recommendation · fills the form (category, name, recommender, URL, description, image upload) · submits · verifies the card appears in the home feed · opens the detail page · posts a 5-star comment · verifies the comment is visible |
+| 2 | `test_student_cannot_delete_others_recommendations` | Creates a student account via Supabase admin API · logs in as that student · opens an admin-owned recommendation · asserts the Delete button is **not** visible in the UI · calls the DELETE endpoint directly and asserts it returns **403 Forbidden** · logs out |
+
+Both tests run against the local server (`http://127.0.0.1:8000`) on Chromium.  
+The suite uses `data-test` attributes for all selectors and the Supabase service-role key for teardown/setup.
+
 ### Run the sanity suite
 
 The sanity suite automatically bypasses the registration CAPTCHA — no extra flag needed.
@@ -133,11 +156,6 @@ To run a **single test**:
 ```bash
 pytest tests/sanity/test_create_recommendation.py::test_admin_creates_recommendation -v
 pytest tests/sanity/test_create_recommendation.py::test_student_cannot_delete_others_recommendations -v
-```
-
-Run only sanity-marked tests:
-```bash
-pytest -m sanity -v
 ```
 
 ---
