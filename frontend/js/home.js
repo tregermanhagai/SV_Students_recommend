@@ -43,12 +43,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (e.target === m) m.classList.remove('visible');
   }));
 
+  // ── More-filters toggle (mobile ···) ─────────────────────────
+  const moreBtn       = document.getElementById('filterMoreBtn');
+  const overflowItems = document.querySelectorAll('.filter-overflow-item');
+
+  if (moreBtn) {
+    moreBtn.addEventListener('click', () => {
+      const isOpen = moreBtn.classList.contains('active');
+      moreBtn.classList.toggle('active', !isOpen);
+      moreBtn.setAttribute('aria-expanded', String(!isOpen));
+      overflowItems.forEach(item => item.classList.toggle('visible', !isOpen));
+    });
+  }
+
   // ── Category filters ──────────────────────────────────────────
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       filterBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       activeCategory = btn.dataset.category;
+      // If an overflow item was selected, keep the overflow open
+      if (btn.classList.contains('filter-overflow-item') && moreBtn) {
+        moreBtn.classList.add('active');
+        moreBtn.setAttribute('aria-expanded', 'true');
+        overflowItems.forEach(item => item.classList.add('visible'));
+      }
       loadRecommendations();
     });
   });
