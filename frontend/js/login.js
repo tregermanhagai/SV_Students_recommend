@@ -1,4 +1,26 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Handle Supabase OAuth callback if this page receives #access_token=...
+  (function () {
+    var params = {};
+    window.location.hash.substring(1).split('&').forEach(function (part) {
+      var eq = part.indexOf('=');
+      if (eq > -1) params[decodeURIComponent(part.slice(0, eq))] = decodeURIComponent(part.slice(eq + 1));
+    });
+    if (params.access_token) {
+      try {
+        var b64     = params.access_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        var payload = JSON.parse(atob(b64));
+        var meta    = payload.user_metadata || {};
+        localStorage.setItem('sv_token', params.access_token);
+        localStorage.setItem('sv_user', JSON.stringify({
+          id: payload.sub, name: meta.full_name || meta.name || payload.email || '', email: payload.email || '',
+        }));
+        window.location.replace('home.html');
+      } catch (e) { /* fall through to normal login page */ }
+      return;
+    }
+  })();
+
   // Redirect if already logged in
   if (isLoggedIn()) {
     window.location.href = 'home.html';
@@ -96,7 +118,9 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Google login is not configured yet. Please contact your instructor.');
       return;
     }
-    const redirectTo = window.location.origin + '/pages/home.html';
+    // redirect_to must be the site root — Supabase always lands there with #access_token=...
+    // index.html handles the token and forwards to home.html
+    const redirectTo = window.location.origin + '/';
     window.location.href =
       `${SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`;
   });

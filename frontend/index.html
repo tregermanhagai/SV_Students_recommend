@@ -2,11 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0; url=pages/login.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SV Students Recommend</title>
   <link rel="icon" href="assets/SVCollege_logo.png" type="image/png" />
 </head>
 <body>
-  <p>Redirecting… <a href="pages/login.html">Click here</a> if not redirected.</p>
+  <script>
+    // Handle Supabase OAuth callback — Google login redirects to the site root
+    // with #access_token=... in the hash. Parse it, save the session, go to home.
+    (function () {
+      var hash = window.location.hash.substring(1);
+      var params = {};
+      hash.split('&').forEach(function (part) {
+        var eq = part.indexOf('=');
+        if (eq > -1) {
+          params[decodeURIComponent(part.slice(0, eq))] =
+            decodeURIComponent(part.slice(eq + 1));
+        }
+      });
+
+      if (params.access_token) {
+        try {
+          // JWT payload is base64url-encoded — convert to standard base64 first
+          var b64 = params.access_token.split('.')[1]
+            .replace(/-/g, '+').replace(/_/g, '/');
+          var payload = JSON.parse(atob(b64));
+          var meta    = payload.user_metadata || {};
+          var name    = meta.full_name || meta.name || payload.email || '';
+
+          localStorage.setItem('sv_token', params.access_token);
+          localStorage.setItem('sv_user', JSON.stringify({
+            id:    payload.sub,
+            name:  name,
+            email: payload.email || '',
+          }));
+          window.location.replace('/pages/home.html');
+        } catch (e) {
+          window.location.replace('/pages/login.html');
+        }
+      } else {
+        window.location.replace('/pages/login.html');
+      }
+    })();
+  </script>
+  <p>Redirecting…</p>
 </body>
 </html>
