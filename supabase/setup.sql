@@ -113,10 +113,13 @@ CREATE INDEX IF NOT EXISTS idx_recs_created_at  ON public.recommendations (creat
 CREATE INDEX IF NOT EXISTS idx_recs_category    ON public.recommendations (category);
 CREATE INDEX IF NOT EXISTS idx_comments_rec_id  ON public.comments (recommendation_id);
 
--- ── 7. Grant admin by email (run AFTER the admin user registers) ────────────
--- UPDATE public.profiles
--- SET is_admin = true
--- WHERE id = (SELECT id FROM auth.users WHERE email = 'hagai@svcollege.co.il');
+-- ── 7. Grant admin by email ──────────────────────────────────────────────────
+UPDATE public.profiles
+SET is_admin = true
+WHERE id IN (
+  SELECT id FROM auth.users
+  WHERE email IN ('admin@svcollege.co.il', 'hagai@svcollege.co.il')
+);
 
 -- ── 8. Storage bucket ────────────────────────────────────────
 INSERT INTO storage.buckets (id, name, public)

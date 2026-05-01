@@ -29,51 +29,53 @@ HEADERS = {
 
 BUCKET = "recommendation-images"
 
+# ── Helper: create or look up a Supabase auth user ──────────────────────────
+def ensure_user(email, password, name):
+    with httpx.Client() as client:
+        resp = client.post(
+            f"{SUPABASE_URL}/auth/v1/admin/users",
+            headers=HEADERS,
+            json={
+                "email":         email,
+                "password":      password,
+                "email_confirm": True,
+                "user_metadata": {"full_name": name},
+            },
+        )
+    data = resp.json()
+    if resp.status_code == 201:
+        uid = data["id"]
+        print(f"      ✓ Created (id={uid})")
+    elif resp.status_code == 422 and "already" in str(data).lower():
+        print("      → Already exists, looking up id…")
+        with httpx.Client() as client:
+            list_resp = client.get(
+                f"{SUPABASE_URL}/auth/v1/admin/users",
+                headers=HEADERS,
+                params={"per_page": 200},
+            )
+        users = list_resp.json().get("users", [])
+        match = next((u for u in users if u.get("email") == email), None)
+        if not match:
+            print(f"      ✗ Could not find existing user. Response: {data}")
+            sys.exit(1)
+        uid = match["id"]
+        print(f"      → Found (id={uid})")
+    else:
+        print(f"      ✗ Unexpected response {resp.status_code}: {data}")
+        sys.exit(1)
+    return uid
+
+
 # ── 1. Create the demo user ──────────────────────────────────────────────────
 DEMO_EMAIL    = "hagai@svcollege.co.il"
 DEMO_PASSWORD = "test1234"
 DEMO_NAME     = "Hagai"
 
-print(f"[1/3] Creating user: {DEMO_EMAIL}")
+print(f"[1/4] Creating user: {DEMO_EMAIL}")
+user_id = ensure_user(DEMO_EMAIL, DEMO_PASSWORD, DEMO_NAME)
 
-with httpx.Client() as client:
-    resp = client.post(
-        f"{SUPABASE_URL}/auth/v1/admin/users",
-        headers=HEADERS,
-        json={
-            "email":         DEMO_EMAIL,
-            "password":      DEMO_PASSWORD,
-            "email_confirm": True,
-            "user_metadata": {"full_name": DEMO_NAME},
-        },
-    )
-
-user_data = resp.json()
-
-if resp.status_code == 201:
-    user_id = user_data["id"]
-    print(f"      ✓ Created (id={user_id})")
-elif resp.status_code == 422 and "already" in str(user_data).lower():
-    # User exists — fetch by listing users and matching email
-    print("      → User already exists, looking up id…")
-    with httpx.Client() as client:
-        list_resp = client.get(
-            f"{SUPABASE_URL}/auth/v1/admin/users",
-            headers=HEADERS,
-            params={"per_page": 200},
-        )
-    users = list_resp.json().get("users", [])
-    match = next((u for u in users if u.get("email") == DEMO_EMAIL), None)
-    if not match:
-        print(f"      ✗ Could not find existing user. Response: {user_data}")
-        sys.exit(1)
-    user_id = match["id"]
-    print(f"      → Found (id={user_id})")
-else:
-    print(f"      ✗ Unexpected response {resp.status_code}: {user_data}")
-    sys.exit(1)
-
-# Upsert profile row (the DB trigger should handle this, but run just in case)
+# Upsert profile row (DB trigger handles this on new sign-up, but run just in case)
 with httpx.Client() as client:
     client.post(
         f"{SUPABASE_URL}/rest/v1/profiles",
@@ -81,12 +83,40 @@ with httpx.Client() as client:
         json={"id": user_id, "name": DEMO_NAME},
     )
 
+# ── 1b. Create the admin user and mark both accounts as admin ────────────────
+ADMIN_EMAIL    = "admin@svcollege.co.il"
+ADMIN_PASSWORD = "test1234"
+ADMIN_NAME     = "Admin"
+
+print(f"\n[2/4] Creating admin user: {ADMIN_EMAIL}")
+admin_id = ensure_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_NAME)
+
+# Upsert profile with is_admin=true for admin account
+with httpx.Client() as client:
+    client.post(
+        f"{SUPABASE_URL}/rest/v1/profiles",
+        headers={**HEADERS, "Prefer": "resolution=merge-duplicates"},
+        json={"id": admin_id, "name": ADMIN_NAME, "is_admin": True},
+    )
+
+# Also ensure hagai is marked as admin
+ADMIN_IDS = [user_id, admin_id]
+with httpx.Client() as client:
+    for uid in ADMIN_IDS:
+        client.patch(
+            f"{SUPABASE_URL}/rest/v1/profiles",
+            headers={**HEADERS, "Prefer": "return=minimal"},
+            params={"id": f"eq.{uid}"},
+            json={"is_admin": True},
+        )
+print("      ✓ is_admin=true set for both admin accounts")
+
 # ── 2. Upload Ozarak.jpg to Storage ─────────────────────────────────────────
 IMAGE_PATH = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "seeds", "images", "Ozarak.jpg")
 )
 
-print(f"\n[2/3] Uploading image: {IMAGE_PATH}")
+print(f"\n[3/4] Uploading image: {IMAGE_PATH}")
 
 rec_id = str(uuid.uuid4())
 content_type, _ = mimetypes.guess_type(IMAGE_PATH)
@@ -118,7 +148,7 @@ else:
     image_url = None
 
 # ── 3. Insert the recommendation ────────────────────────────────────────────
-print(f"\n[3/3] Inserting recommendation 'Ozark'")
+print(f"\n[4/4] Inserting recommendation 'Ozark'")
 
 row = {
     "id":               rec_id,
@@ -148,5 +178,6 @@ else:
     sys.exit(1)
 
 print("\n✅  Seed complete!")
-print(f"    Login : {DEMO_EMAIL}")
-print(f"    Pass  : {DEMO_PASSWORD}")
+print(f"    Demo  login : {DEMO_EMAIL}  /  {DEMO_PASSWORD}")
+print(f"    Admin login : {ADMIN_EMAIL}  /  {ADMIN_PASSWORD}")
+print(f"    hagai login : {DEMO_EMAIL}  /  {DEMO_PASSWORD}  (is_admin=true)")

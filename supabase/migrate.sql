@@ -32,3 +32,12 @@ CREATE POLICY "settings_all"    ON public.system_settings FOR ALL    USING (true
 INSERT INTO public.system_settings (key, value)
 VALUES ('recommendations_enabled', 'true')
 ON CONFLICT DO NOTHING;
+
+-- ── Grant admin flag to pre-configured admin accounts ────────
+-- Runs safely even if accounts don't exist yet (no-op in that case)
+UPDATE public.profiles
+SET is_admin = true
+WHERE id IN (
+  SELECT id FROM auth.users
+  WHERE email IN ('admin@svcollege.co.il', 'hagai@svcollege.co.il')
+);
