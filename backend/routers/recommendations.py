@@ -97,6 +97,15 @@ async def create_recommendation(
 
     Send as `multipart/form-data` to include an optional image upload.
     """
+    # Check global kill-switch
+    sb = get_supabase()
+    setting = sb.table("system_settings").select("value").eq("key", "recommendations_enabled").execute()
+    if setting.data and setting.data[0]["value"] == "false":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="New recommendations are currently disabled by the administrator.",
+        )
+
     valid_categories = {"Book", "Movie", "Series", "Activity", "Other"}
     if category not in valid_categories:
         raise HTTPException(
@@ -110,7 +119,6 @@ async def create_recommendation(
     if image and image.filename:
         image_url = await upload_image(image, current_user["id"], rec_id)
 
-    sb = get_supabase()
     row = {
         "id": rec_id,
         "name": name,

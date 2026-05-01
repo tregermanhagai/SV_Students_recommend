@@ -22,6 +22,15 @@ def register(body: UserRegister):
     - **password**: Minimum 4 English characters
     """
     sb = get_supabase()
+
+    # Reject blacklisted emails before account creation
+    bl = sb.table("email_blacklist").select("id").eq("email", body.email.lower()).execute()
+    if bl.data:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This email address is not allowed to register.",
+        )
+
     try:
         result = sb.auth.sign_up(
             {
@@ -69,6 +78,15 @@ def login(body: UserLogin):
     in protected endpoints or on the Profile page.
     """
     sb = get_supabase()
+
+    # Reject blacklisted emails before attempting login
+    bl = sb.table("email_blacklist").select("id").eq("email", body.email.lower()).execute()
+    if bl.data:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This account has been disabled.",
+        )
+
     try:
         result = sb.auth.sign_in_with_password(
             {"email": body.email, "password": body.password}

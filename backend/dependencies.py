@@ -47,8 +47,25 @@ async def get_current_user(authorization: str = Header(...)) -> dict:
     if profile.status_code == 200 and profile.json():
         is_admin = bool(profile.json()[0].get("is_admin", False))
 
+    user_email = user_data.get("email", "")
+
+    # Block blacklisted emails at the API level (catches Google OAuth too)
+    blacklist = httpx.get(
+        f"{settings.supabase_url}/rest/v1/email_blacklist",
+        params={"email": f"eq.{user_email}", "select": "id"},
+        headers={
+            "apikey":        settings.supabase_service_key,
+            "Authorization": f"Bearer {settings.supabase_service_key}",
+        },
+    )
+    if blacklist.status_code == 200 and blacklist.json():
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Your account has been disabled.",
+        )
+
     return {
         "id":       user_id,
-        "email":    user_data.get("email", ""),
+        "email":    user_email,
         "is_admin": is_admin,
     }

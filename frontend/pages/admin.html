@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>User Management – SV Students Recommend</title>
+  <title>System – SV Students Recommend</title>
   <link rel="stylesheet" href="../assets/style.css?v=2" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="icon" href="../assets/SVCollege_logo.png" type="image/png" />
@@ -19,6 +19,7 @@
   <nav class="header-nav">
     <a class="nav-link" href="home.html"    data-test="nav-home">Home</a>
     <a class="nav-link" href="profile.html" data-test="nav-profile">My Profile</a>
+    <a class="nav-link" href="admin.html" id="navSystem" data-test="nav-system" style="display:none">System</a>
     <a class="nav-link" href="#" id="btnLogout" data-test="nav-logout">Logout</a>
   </nav>
 </header>
@@ -26,9 +27,16 @@
 <main class="container">
   <div class="page-card">
     <h2 style="margin-bottom:6px">
-      <i class="fas fa-shield-halved" style="margin-right:8px; color:var(--primary)"></i>User Management
+      <i class="fas fa-shield-halved" style="margin-right:8px; color:var(--primary)"></i>System Management
     </h2>
     <p style="color:var(--text-muted); margin-bottom:24px; font-size:0.9rem">
+      Platform moderation and settings.
+    </p>
+
+    <h3 style="margin-bottom:6px">
+      <i class="fas fa-users" style="margin-right:8px; color:var(--primary)"></i>User Management
+    </h3>
+    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:16px">
       Ban or unban users. Banned users cannot log in.
     </p>
 
@@ -55,6 +63,73 @@
         <tbody id="adminUserRows"></tbody>
       </table>
     </div>
+
+    <hr style="border:none; border-top:1.5px solid var(--border); margin:32px 0" />
+
+    <!-- ── Section 2: Email Blacklist ── -->
+    <h3 style="margin-bottom:6px">
+      <i class="fas fa-ban" style="margin-right:8px; color:var(--danger)"></i>Email Blacklist
+    </h3>
+    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:16px">
+      Blocked emails cannot register or log in.
+    </p>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px">
+      <input type="email" id="blacklistEmailInput" class="form-control"
+             placeholder="email@example.com" data-test="input-blacklist-email"
+             style="max-width:320px" autocomplete="off" />
+      <button class="btn btn-primary" id="btnAddBlacklist" data-test="btn-add-blacklist"
+              style="width:auto; padding:9px 20px">Block Email</button>
+    </div>
+    <div id="blacklistMsg" data-test="blacklist-msg"
+         style="display:none; font-size:0.88rem; margin-bottom:12px"></div>
+
+    <div id="blacklistTableWrap" style="overflow-x:auto; display:none">
+      <table class="admin-table" data-test="blacklist-table">
+        <thead><tr><th>Email</th><th>Blocked On</th><th>Action</th></tr></thead>
+        <tbody id="blacklistRows"></tbody>
+      </table>
+    </div>
+    <div id="blacklistEmpty" data-test="blacklist-empty"
+         style="display:none; color:var(--text-muted); font-size:0.9rem">No emails blocked yet.</div>
+
+    <hr style="border:none; border-top:1.5px solid var(--border); margin:32px 0" />
+
+    <!-- ── Section 3: Recommendation Kill-Switch ── -->
+    <h3 style="margin-bottom:6px">
+      <i class="fas fa-toggle-on" style="margin-right:8px; color:var(--primary)"></i>New Recommendations
+    </h3>
+    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:16px">
+      When suspended, no user can add new recommendations.
+    </p>
+
+    <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap">
+      <span id="recStatusBadge" data-test="rec-status" class="badge-active">Loading…</span>
+      <button class="btn" id="btnToggleRecs" data-test="btn-toggle-recommendations"
+              style="width:auto; padding:8px 20px" disabled>…</button>
+    </div>
+
+    <hr style="border:none; border-top:1.5px solid var(--border); margin:32px 0" />
+
+    <!-- ── Section 4: Delete Recommendation by ID ── -->
+    <h3 style="margin-bottom:6px">
+      <i class="fas fa-trash-can" style="margin-right:8px; color:var(--danger)"></i>Delete Recommendation by ID
+    </h3>
+    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:16px">
+      Enter the recommendation UUID to permanently remove it.
+    </p>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px">
+      <input type="text" id="deleteRecIdInput" class="form-control"
+             placeholder="e.g. f383054d-1517-4963-a177-1fdab4a18aab"
+             data-test="input-rec-id" style="max-width:420px" autocomplete="off" />
+      <button class="btn" id="btnDeleteRecById" data-test="btn-delete-rec-by-id"
+              style="width:auto; padding:9px 20px; background:var(--danger); color:#fff; border:none">
+        Delete
+      </button>
+    </div>
+    <div id="deleteRecMsg" data-test="delete-rec-msg"
+         style="display:none; font-size:0.88rem"></div>
   </div>
 </main>
 

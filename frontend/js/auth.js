@@ -63,8 +63,11 @@ function wirePasswordToggle(inputId) {
   });
 }
 
-// Wire up any logout buttons on the page
+// Wire up logout buttons and admin System nav link
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-test="nav-logout"], [data-test="btn-logout"]')
     .forEach(el => el.addEventListener('click', (e) => { e.preventDefault(); logout(); }));
+
+  const navSystem = document.getElementById('navSystem');
+  if (navSystem && isAdmin()) navSystem.style.display = '';
 });

@@ -1,5 +1,5 @@
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from config import get_settings
 from services.supabase_client import get_supabase
 from dependencies import get_current_user
@@ -84,3 +84,51 @@ def unban_user(user_id: str, current_user: dict = Depends(require_admin)):
     if resp.status_code not in (200, 204):
         raise HTTPException(status_code=500, detail="Failed to unban user.")
     return {"status": "unbanned"}
+
+
+# ── Email Blacklist ───────────────────────────────────────────
+
+@router.get("/admin/blacklist", summary="List blacklisted emails (admin only)")
+def list_blacklist(current_user: dict = Depends(require_admin)):
+    sb = get_supabase()
+    rows = sb.table("email_blacklist").select("id, email, created_at").order("created_at", desc=True).execute()
+    return rows.data or []
+
+
+@router.post("/admin/blacklist", status_code=201, summary="Add email to blacklist (admin only)")
+def add_blacklist(email: str = Body(..., embed=True), current_user: dict = Depends(require_admin)):
+    email = email.strip().lower()
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required.")
+    sb = get_supabase()
+    existing = sb.table("email_blacklist").select("id").eq("email", email).execute()
+    if existing.data:
+        raise HTTPException(status_code=409, detail="Email is already blacklisted.")
+    result = sb.table("email_blacklist").insert({"email": email, "added_by": current_user["id"]}).execute()
+    if not result.data:
+        raise HTTPException(status_code=500, detail="Failed to add email to blacklist.")
+    return result.data[0]
+
+
+@router.delete("/admin/blacklist/{entry_id}", status_code=204, summary="Remove email from blacklist (admin only)")
+def remove_blacklist(entry_id: str, current_user: dict = Depends(require_admin)):
+    sb = get_supabase()
+    sb.table("email_blacklist").delete().eq("id", entry_id).execute()
+
+
+# ── System Settings ───────────────────────────────────────────
+
+@router.get("/admin/settings", summary="Get system settings (admin only)")
+def get_settings_endpoint(current_user: dict = Depends(require_admin)):
+    sb = get_supabase()
+    rows = sb.table("system_settings").select("key, value, updated_at").execute()
+    return {r["key"]: r["value"] for r in (rows.data or [])}
+
+
+@router.put("/admin/settings/{key}", summary="Update a system setting (admin only)")
+def update_setting(key: str, value: str = Body(..., embed=True), current_user: dict = Depends(require_admin)):
+    sb = get_supabase()
+    result = sb.table("system_settings").upsert({"key": key, "value": value, "updated_at": "now()"}).execute()
+    if not result.data:
+        raise HTTPException(status_code=500, detail="Failed to update setting.")
+    return {"key": key, "value": value}
