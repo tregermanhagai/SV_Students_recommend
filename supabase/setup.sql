@@ -126,7 +126,17 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('recommendation-images', 'recommendation-images', true)
 ON CONFLICT (id) DO NOTHING;
 
--- ── 9. Email blacklist ───────────────────────────────────────
+-- ── 9. Shopping cart (per user) ─────────────────────────────
+CREATE TABLE IF NOT EXISTS public.carts (
+  user_id    UUID        PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  items      JSONB       NOT NULL DEFAULT '[]',
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE public.carts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "cart_owner" ON public.carts;
+CREATE POLICY "cart_owner" ON public.carts FOR ALL USING (auth.uid() = user_id);
+
+-- ── 10. Email blacklist ───────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.email_blacklist (
   id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   email      TEXT        NOT NULL UNIQUE,
@@ -139,7 +149,7 @@ DROP POLICY IF EXISTS "blacklist_all"    ON public.email_blacklist;
 CREATE POLICY "blacklist_select" ON public.email_blacklist FOR SELECT USING (true);
 CREATE POLICY "blacklist_all"    ON public.email_blacklist FOR ALL    USING (true);
 
--- ── 10. System settings (key-value) ─────────────────────────
+-- ── 11. System settings (key-value) ─────────────────────────
 CREATE TABLE IF NOT EXISTS public.system_settings (
   key        TEXT        PRIMARY KEY,
   value      TEXT        NOT NULL,

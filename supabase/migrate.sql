@@ -33,6 +33,16 @@ INSERT INTO public.system_settings (key, value)
 VALUES ('recommendations_enabled', 'true')
 ON CONFLICT DO NOTHING;
 
+-- ── Shopping cart (per user) ────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.carts (
+  user_id    UUID        PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  items      JSONB       NOT NULL DEFAULT '[]',
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE public.carts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "cart_owner" ON public.carts;
+CREATE POLICY "cart_owner" ON public.carts FOR ALL USING (auth.uid() = user_id);
+
 -- ── Grant admin flag to pre-configured admin accounts ────────
 -- Runs safely even if accounts don't exist yet (no-op in that case)
 UPDATE public.profiles

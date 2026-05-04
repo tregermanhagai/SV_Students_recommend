@@ -1,109 +1,129 @@
-function getCart() {
+const MAX_QTY = 10;
+
+let cartItems = [];
+
+async function loadCart() {
   try {
-    return JSON.parse(localStorage.getItem('sv_cart') || 'null');
+    const data = await apiFetch('/api/cart');
+    return data.items || [];
   } catch {
-    return null;
+    return [];
   }
 }
 
-function saveCart(cart) {
-  localStorage.setItem('sv_cart', JSON.stringify(cart));
+async function persistCart() {
+  try {
+    await apiFetch('/api/cart', {
+      method: 'PUT',
+      body: JSON.stringify({ items: cartItems }),
+    });
+  } catch (err) {
+    console.error('Failed to save cart:', err);
+  }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  requireAuth();
+function updateCartIcon() {
+  const navCart = document.getElementById('navCart');
+  const badge = document.getElementById('cartBadge');
+  const totalQty = cartItems.reduce((sum, i) => sum + i.quantity, 0);
+  if (totalQty > 0) {
+    navCart.style.display = '';
+    badge.textContent = String(totalQty);
+  } else {
+    navCart.style.display = 'none';
+  }
+}
 
-  const cart = getCart();
-  if (!cart || !cart.product || !cart.price) {
-    window.location.href = 'store.html';
+function renderCart() {
+  const listEl = document.getElementById('cartItemsList');
+  const emptyEl = document.getElementById('cartEmpty');
+  const contentEl = document.getElementById('cartContent');
+  const grandTotalEl = document.getElementById('cartGrandTotal');
+
+  updateCartIcon();
+
+  if (cartItems.length === 0) {
+    emptyEl.style.display = '';
+    contentEl.style.display = 'none';
     return;
   }
 
-  const productName = document.getElementById('cartProductName');
-  const unitPrice = document.getElementById('cartUnitPrice');
-  const quantityEl = document.getElementById('cartQuantity');
-  const totalEl = document.getElementById('cartTotal');
-  const errorEl = document.getElementById('cartError');
-  const sizeSelector = document.getElementById('sizeSelector');
+  emptyEl.style.display = 'none';
+  contentEl.style.display = '';
 
-  const minusBtn = document.getElementById('btnQtyMinus');
-  const plusBtn = document.getElementById('btnQtyPlus');
-  const proceedBtn = document.getElementById('btnProceedPayment');
-  const sizeButtons = document.querySelectorAll('.size-btn');
+  let grandTotal = 0;
+  listEl.innerHTML = '';
 
-  let quantity = Number(cart.quantity) || 1;
-  quantity = Math.min(99, Math.max(1, quantity));
-  let size = cart.size || '';
+  cartItems.forEach((item) => {
+    const subtotal = item.price * item.quantity;
+    grandTotal += subtotal;
 
-  function hideError() {
-    errorEl.classList.remove('visible');
-    errorEl.textContent = '';
-  }
-
-  function showError(message) {
-    errorEl.textContent = message;
-    errorEl.classList.add('visible');
-  }
-
-  function updateSizeUI() {
-    sizeButtons.forEach((button) => {
-      button.classList.toggle('active', button.getAttribute('data-size') === size);
-    });
-  }
-
-  function updateTotals() {
-    const total = quantity * Number(cart.price);
-
-    productName.textContent = cart.name;
-    unitPrice.textContent = `Unit price: ${cart.price} NIS`;
-    quantityEl.textContent = String(quantity);
-    totalEl.textContent = `${total} NIS`;
-
-    cart.quantity = quantity;
-    if (cart.product === 'tshirt') {
-      cart.size = size;
-    } else {
-      cart.size = '';
-    }
-    saveCart(cart);
-  }
-
-  if (cart.product === 'tshirt') {
-    sizeSelector.style.display = 'block';
-    updateSizeUI();
-  }
-
-  minusBtn.addEventListener('click', () => {
-    hideError();
-    quantity = Math.max(1, quantity - 1);
-    updateTotals();
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.setAttribute('data-test', `cart-item-${item.product}`);
+    div.innerHTML = `
+      <div class="cart-item-info">
+        <div class="cart-item-name" data-test="cart-item-name-${item.product}">${item.name}</div>
+        <div class="cart-item-unit-price" data-test="cart-item-price-${item.product}">${item.price} NIS each</div>
+      </div>
+      <div class="cart-item-controls">
+        <div class="qty-stepper">
+          <button type="button" class="btn-qty-minus" data-product="${item.product}"
+            aria-label="Decrease quantity" data-test="btn-qty-minus-${item.product}">-</button>
+          <div class="qty-display" data-test="cart-qty-${item.product}">${item.quantity}</div>
+          <button type="button" class="btn-qty-plus" data-product="${item.product}"
+            aria-label="Increase quantity" data-test="btn-qty-plus-${item.product}">+</button>
+        </div>
+        <div class="cart-item-subtotal" data-test="cart-subtotal-${item.product}">${subtotal} NIS</div>
+        <button type="button" class="btn btn-danger btn-remove" data-product="${item.product}"
+          data-test="btn-remove-${item.product}">Remove</button>
+      </div>
+    `;
+    listEl.appendChild(div);
   });
 
-  plusBtn.addEventListener('click', () => {
-    hideError();
-    quantity = Math.min(99, quantity + 1);
-    updateTotals();
-  });
+  grandTotalEl.textContent = `${grandTotal} NIS`;
 
-  sizeButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-      hideError();
-      size = button.getAttribute('data-size') || '';
-      updateSizeUI();
-      updateTotals();
+  listEl.querySelectorAll('.btn-qty-minus').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const key = btn.getAttribute('data-product');
+      const item = cartItems.find((i) => i.product === key);
+      if (!item || item.quantity <= 1) return;
+      item.quantity--;
+      renderCart();
+      await persistCart();
     });
   });
 
-  proceedBtn.addEventListener('click', () => {
-    hideError();
-    if (cart.product === 'tshirt' && !size) {
-      showError('Please select a size before proceeding.');
-      return;
-    }
+  listEl.querySelectorAll('.btn-qty-plus').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const key = btn.getAttribute('data-product');
+      const item = cartItems.find((i) => i.product === key);
+      if (!item || item.quantity >= MAX_QTY) return;
+      item.quantity++;
+      renderCart();
+      await persistCart();
+    });
+  });
 
-    updateTotals();
+  listEl.querySelectorAll('.btn-remove').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const key = btn.getAttribute('data-product');
+      cartItems = cartItems.filter((i) => i.product !== key);
+      renderCart();
+      await persistCart();
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  requireAuth();
+
+  cartItems = await loadCart();
+  renderCart();
+
+  document.getElementById('btnProceedPayment').addEventListener('click', () => {
+    if (cartItems.length === 0) return;
     window.location.href = 'payment.html';
   });
-
-  updateTotals();
 });

@@ -21,6 +21,10 @@
             <a class="nav-link" href="home.html" data-test="nav-home">Home</a>
             <a class="nav-link" href="profile.html" data-test="nav-profile">My Profile</a>
             <a class="nav-link" href="admin.html" id="navSystem" data-test="nav-system" style="display:none">System</a>
+            <a class="nav-link nav-cart" href="cart.html" id="navCart" data-test="nav-cart" style="display:none">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge" id="cartBadge" data-test="cart-badge">0</span>
+            </a>
             <a class="nav-link" href="#" id="btnLogout" data-test="nav-logout">Logout</a>
             <a class="btn-accent" href="add-recommendation.html" data-test="nav-signup-recommendations">+ Add
                 Recommendation</a>
@@ -33,11 +37,11 @@
 
             <section class="order-summary-box" data-test="order-summary">
                 <h3>Order Summary</h3>
-                <div class="order-row"><span>Product</span><span id="summaryProduct">-</span></div>
-                <div class="order-row"><span>Quantity</span><span id="summaryQuantity">-</span></div>
-                <div class="order-row" id="summarySizeRow" style="display:none"><span>Size</span><span
-                        id="summarySize">-</span></div>
-                <div class="order-row total"><span>Total</span><strong id="summaryTotal">0 NIS</strong></div>
+                <div id="summaryItems"></div>
+                <div class="order-row total">
+                    <span>Total</span>
+                    <strong id="summaryTotal" data-test="order-total">0 NIS</strong>
+                </div>
             </section>
 
             <div class="alert alert-error" id="paymentError"></div>
@@ -90,6 +94,7 @@
       </div>
     </footer>
 
+    <script src="../js/api.js"></script>
     <script src="../js/auth.js"></script>
     <script src="../js/payment.js"></script>
 </body>

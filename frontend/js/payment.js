@@ -1,29 +1,67 @@
-function readCart() {
-  try {
-    return JSON.parse(localStorage.getItem('sv_cart') || 'null');
-  } catch {
-    return null;
-  }
-}
-
 function digitsOnly(value) {
   return (value || '').replace(/\D/g, '');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+async function loadCart() {
+  try {
+    const data = await apiFetch('/api/cart');
+    return data.items || [];
+  } catch {
+    return [];
+  }
+}
+
+async function clearServerCart() {
+  try {
+    await apiFetch('/api/cart', {
+      method: 'PUT',
+      body: JSON.stringify({ items: [] }),
+    });
+  } catch (err) {
+    console.error('Failed to clear cart:', err);
+  }
+}
+
+function updateCartIcon(items) {
+  const navCart = document.getElementById('navCart');
+  const badge = document.getElementById('cartBadge');
+  const totalQty = items.reduce((sum, i) => sum + i.quantity, 0);
+  if (totalQty > 0) {
+    navCart.style.display = '';
+    badge.textContent = String(totalQty);
+  } else {
+    navCart.style.display = 'none';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
   requireAuth();
 
-  const cart = readCart();
-  if (!cart || !cart.product || !cart.price || !cart.quantity) {
+  const cartItems = await loadCart();
+
+  if (cartItems.length === 0) {
     window.location.href = 'store.html';
     return;
   }
 
-  const summaryProduct = document.getElementById('summaryProduct');
-  const summaryQuantity = document.getElementById('summaryQuantity');
-  const summarySizeRow = document.getElementById('summarySizeRow');
-  const summarySize = document.getElementById('summarySize');
-  const summaryTotal = document.getElementById('summaryTotal');
+  updateCartIcon(cartItems);
+
+  const summaryItemsEl = document.getElementById('summaryItems');
+  const summaryTotalEl = document.getElementById('summaryTotal');
+
+  let grandTotal = 0;
+  cartItems.forEach((item) => {
+    const subtotal = item.price * item.quantity;
+    grandTotal += subtotal;
+
+    const row = document.createElement('div');
+    row.className = 'order-row';
+    row.setAttribute('data-test', `summary-item-${item.product}`);
+    row.innerHTML = `<span>${item.name} &times; ${item.quantity}</span><span>${subtotal} NIS</span>`;
+    summaryItemsEl.appendChild(row);
+  });
+
+  summaryTotalEl.textContent = `${grandTotal} NIS`;
 
   const form = document.getElementById('paymentForm');
   const errorEl = document.getElementById('paymentError');
@@ -34,18 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const cardNumberEl = document.getElementById('cardNumber');
   const cvvEl = document.getElementById('cvv');
   const expiryEl = document.getElementById('expiry');
-
-  const quantity = Math.max(1, Number(cart.quantity) || 1);
-  const total = quantity * Number(cart.price);
-
-  summaryProduct.textContent = cart.name;
-  summaryQuantity.textContent = String(quantity);
-  summaryTotal.textContent = `${total} NIS`;
-
-  if (cart.product === 'tshirt') {
-    summarySizeRow.style.display = 'flex';
-    summarySize.textContent = cart.size || '-';
-  }
 
   cardNumberEl.addEventListener('input', () => {
     const digits = digitsOnly(cardNumberEl.value).slice(0, 16);
@@ -68,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     errorEl.classList.add('visible');
   }
 
-  form.addEventListener('submit', (event) => {
+  form.addEventListener('submit', async (event) => {
     event.preventDefault();
     clearMessages();
 
@@ -110,8 +136,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    localStorage.removeItem('sv_cart');
+    await clearServerCart();
     form.style.display = 'none';
+    updateCartIcon([]);
     successEl.textContent = 'Order placed! Thank you.';
     successEl.classList.add('visible');
   });

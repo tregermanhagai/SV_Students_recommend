@@ -670,6 +670,32 @@ textarea.form-control { resize: vertical; min-height: 90px; }
 }
 .modal-close:hover { color: var(--text); }
 
+/* ── Cart Nav Icon ──────────────────────────────────────────── */
+.nav-cart {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cart-badge {
+  position: absolute;
+  top: 0;
+  right: 2px;
+  background: var(--accent);
+  color: var(--primary-dark);
+  font-size: 0.68rem;
+  font-weight: 800;
+  min-width: 17px;
+  height: 17px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
+  pointer-events: none;
+}
+
 /* ── Store / Cart / Payment ─────────────────────────────────── */
 .product-grid {
   display: grid;
@@ -703,7 +729,56 @@ textarea.form-control { resize: vertical; min-height: 90px; }
 .product-name { font-size: 1.05rem; font-weight: 700; color: var(--primary); }
 .price-badge { font-size: 1.15rem; font-weight: 700; color: var(--accent); }
 
-.cart-box { max-width: 520px; }
+.cart-box { max-width: 640px; }
+
+/* ── Cart multi-item list ───────────────────────────────────── */
+.cart-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.cart-item:last-child { border-bottom: none; }
+
+.cart-item-info { flex: 1; min-width: 140px; }
+
+.cart-item-name {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.95rem;
+}
+
+.cart-item-unit-price {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.cart-item-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cart-item-subtotal {
+  font-weight: 700;
+  min-width: 64px;
+  text-align: right;
+  font-size: 0.95rem;
+}
+
+.btn-remove {
+  font-size: 0.82rem;
+  padding: 5px 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  width: auto;
+}
+
 .cart-product-summary {
   background: #f8f9fa;
   border: 1.5px solid var(--border);
