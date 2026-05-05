@@ -814,8 +814,8 @@ textarea.form-control { resize: vertical; min-height: 90px; }
   margin-bottom: 24px;
 }
 .order-summary-box h3 { margin: 0 0 12px; font-size: 1rem; color: var(--primary); }
-.order-row { display: flex; justify-content: space-between; gap: 16px; font-size: 0.93rem; margin-bottom: 6px; }
-.order-row > *:last-child { white-space: nowrap; flex-shrink: 0; text-align: right; }
+.order-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: baseline; font-size: 0.93rem; margin-bottom: 6px; }
+.order-row > *:last-child { white-space: nowrap; text-align: right; }
 .order-row.total { font-weight: 700; font-size: 1.05rem; border-top: 1.5px solid var(--border); padding-top: 10px; margin-top: 6px; }
 
 /* ── Site Footer ─────────────────────────────────────────────── */
