@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const row = document.createElement('div');
     row.className = 'order-row';
     row.setAttribute('data-test', `summary-item-${item.product}`);
-    row.innerHTML = `<span>${item.name} &times; ${item.quantity}</span><span>${subtotal} NIS</span>`;
+    row.innerHTML = `<span>${item.name} &times; ${item.quantity} |</span><span>${subtotal} NIS</span>`;
     summaryItemsEl.appendChild(row);
   });
 
