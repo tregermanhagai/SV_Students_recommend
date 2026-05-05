@@ -25,6 +25,7 @@ async function clearServerCart() {
 function updateCartIcon(items) {
   const navCart = document.getElementById('navCart');
   const badge = document.getElementById('cartBadge');
+  if (!navCart) return;
   const totalQty = items.reduce((sum, i) => sum + i.quantity, 0);
   if (totalQty > 0) {
     navCart.style.display = '';

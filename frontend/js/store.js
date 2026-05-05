@@ -30,6 +30,7 @@ async function persistCart() {
 function updateCartIcon() {
   const navCart = document.getElementById('navCart');
   const badge = document.getElementById('cartBadge');
+  if (!navCart) return;
   const totalQty = cartItems.reduce((sum, i) => sum + i.quantity, 0);
   if (totalQty > 0) {
     navCart.style.display = '';
@@ -39,14 +40,20 @@ function updateCartIcon() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
   requireAuth();
 
-  cartItems = await loadCart();
-  updateCartIcon();
+  // Kick off the cart fetch immediately but don't block listener attachment.
+  // Each click handler awaits this promise — it resolves instantly on repeat clicks.
+  const cartReady = loadCart().then((items) => {
+    cartItems = items;
+    updateCartIcon();
+  });
 
   document.querySelectorAll('[data-product]').forEach((button) => {
     button.addEventListener('click', async () => {
+      await cartReady;
+
       const key = button.getAttribute('data-product');
       const product = PRODUCTS[key];
       if (!product) return;
