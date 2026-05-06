@@ -110,13 +110,13 @@ async function loadComments() {
       return;
     }
     empty.style.display = 'none';
-    comments.forEach(c => list.appendChild(buildCommentEl(c)));
+    comments.forEach(c => list.appendChild(buildCommentEl(c, recId)));
   } catch (_) {
     // silently fail on comment load
   }
 }
 
-function buildCommentEl(c) {
+function buildCommentEl(c, recId) {
   const el = document.createElement('div');
   el.className = 'comment-item';
   el.setAttribute('data-test', 'comment-item');
@@ -135,6 +135,30 @@ function buildCommentEl(c) {
     </div>
     <div class="stars-display" data-test="comment-rating">${stars}</div>
     ${text}`;
+
+  const user = getUser();
+  if (user && (c.commenter_id === user.id || user.is_admin)) {
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'btn btn-danger';
+    deleteBtn.style.cssText = 'width:auto;padding:4px 12px;font-size:0.8rem;margin-top:6px';
+    deleteBtn.setAttribute('data-test', `btn-delete-comment-${c.id}`);
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.addEventListener('click', async () => {
+      try {
+        await apiFetch(`/api/recommendations/${recId}/comments/${c.id}`, { method: 'DELETE' });
+        el.remove();
+        const list = document.getElementById('commentsList');
+        if (!list.querySelector('.comment-item')) {
+          document.getElementById('noComments').style.display = 'block';
+        }
+        const countEl = document.getElementById('detailCommentCount');
+        if (countEl) countEl.textContent = Math.max(0, parseInt(countEl.textContent || '0') - 1);
+      } catch (err) {
+        alert('Delete failed: ' + err.message);
+      }
+    });
+    el.appendChild(deleteBtn);
+  }
 
   return el;
 }

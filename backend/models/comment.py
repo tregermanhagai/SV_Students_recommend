@@ -10,6 +10,7 @@ class CommentCreate(BaseModel):
 class CommentOut(BaseModel):
     id: str
     recommendation_id: str
+    commenter_id: Optional[str] = None
     commenter_name: str
     rating: int
     comment_text: Optional[str]
