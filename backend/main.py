@@ -13,6 +13,7 @@ app = FastAPI(
     title="SV Students Recommend API",
     description=(
         "Practice REST API for SV College students.\n\n"
+        "**Base URL:** `https://sv-students-recommend.onrender.com`\n\n"
         "Use the **POST /auth/login** endpoint to get your Bearer token, "
         "then click **Authorize** above to authenticate protected endpoints."
     ),
