@@ -77,6 +77,14 @@ def login(body: UserLogin):
     Returns an **access_token** — copy it to use as your Bearer token
     in protected endpoints or on the Profile page.
     """
+    _unauthorized = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid email or password.",
+    )
+
+    if not body.email.strip() or not body.password.strip():
+        raise _unauthorized
+
     sb = get_supabase()
 
     # Reject blacklisted emails before attempting login
@@ -91,17 +99,11 @@ def login(body: UserLogin):
         result = sb.auth.sign_in_with_password(
             {"email": body.email, "password": body.password}
         )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid email or password.",
-        )
+    except Exception:
+        raise _unauthorized
 
     if not result.user or not result.session:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid email or password.",
-        )
+        raise _unauthorized
 
     name = (result.user.user_metadata or {}).get("full_name", result.user.email)
 
