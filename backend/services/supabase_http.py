@@ -8,6 +8,8 @@ import httpx
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
+_TIMEOUT = httpx.Timeout(10.0)
+
 
 # ── Result wrappers ──────────────────────────────────────────────────────────
 
@@ -38,10 +40,11 @@ class AuthResult:
 # ── Table query builder ──────────────────────────────────────────────────────
 
 class TableQuery:
-    def __init__(self, base_url: str, headers: dict, table: str):
+    def __init__(self, base_url: str, headers: dict, table: str, client: httpx.Client):
         self._base_url = base_url
         self._headers = dict(headers)
         self._table = table
+        self._client = client
         self._select = "*"
         self._count = None          # "exact" | None
         self._filters: list[str] = []
@@ -118,7 +121,7 @@ class TableQuery:
                 headers["Range"] = f"{self._range[0]}-{self._range[1]}"
             headers["Content-Type"] = "application/json"
 
-            resp = httpx.get(url, headers=headers, params=params)
+            resp = self._client.get(url, headers=headers, params=params)
             resp.raise_for_status()
 
             if self._count == "exact":
@@ -134,10 +137,9 @@ class TableQuery:
         elif self._operation == "insert":
             headers["Content-Type"] = "application/json"
             headers["Prefer"] = "return=representation"
-            resp = httpx.post(url, headers=headers, json=self._body)
+            resp = self._client.post(url, headers=headers, json=self._body)
             resp.raise_for_status()
             data = resp.json()
-            # PostgREST returns a list on insert; unwrap to list for consistency
             return Result(data=data if isinstance(data, list) else [data])
 
         elif self._operation == "upsert":
@@ -150,7 +152,7 @@ class TableQuery:
             for f in self._filters:
                 k, v = f.split("=", 1)
                 params[k] = v
-            resp = httpx.post(url, headers=headers, json=self._body, params=params)
+            resp = self._client.post(url, headers=headers, json=self._body, params=params)
             resp.raise_for_status()
             data = resp.json()
             return Result(data=data if isinstance(data, list) else [data])
@@ -161,7 +163,7 @@ class TableQuery:
             for f in self._filters:
                 k, v = f.split("=", 1)
                 params[k] = v
-            resp = httpx.patch(url, headers=headers, json=self._body, params=params)
+            resp = self._client.patch(url, headers=headers, json=self._body, params=params)
             resp.raise_for_status()
             data = resp.json()
             return Result(data=data if isinstance(data, list) else [data])
@@ -170,7 +172,7 @@ class TableQuery:
             for f in self._filters:
                 k, v = f.split("=", 1)
                 params[k] = v
-            resp = httpx.delete(url, headers=headers, params=params)
+            resp = self._client.delete(url, headers=headers, params=params)
             resp.raise_for_status()
             return Result(data=None)
 
@@ -180,10 +182,11 @@ class TableQuery:
 # ── Storage ──────────────────────────────────────────────────────────────────
 
 class StorageBucket:
-    def __init__(self, base_url: str, headers: dict, bucket: str):
+    def __init__(self, base_url: str, headers: dict, bucket: str, client: httpx.Client):
         self._base_url = base_url
         self._headers = headers
         self._bucket = bucket
+        self._client = client
 
     def upload(self, path: str, data: bytes, file_options: dict = None):
         file_options = file_options or {}
@@ -196,7 +199,7 @@ class StorageBucket:
             "x-upsert":      upsert,
         }
         url = f"{self._base_url}/storage/v1/object/{self._bucket}/{path}"
-        resp = httpx.post(url, headers=headers, content=data)
+        resp = self._client.post(url, headers=headers, content=data)
         resp.raise_for_status()
         return resp.json()
 
@@ -207,26 +210,28 @@ class StorageBucket:
         url = f"{self._base_url}/storage/v1/object/{self._bucket}"
         headers = dict(self._headers)
         headers["Content-Type"] = "application/json"
-        resp = httpx.delete(url, headers=headers, json={"prefixes": paths})
+        resp = self._client.delete(url, headers=headers, json={"prefixes": paths})
         resp.raise_for_status()
         return resp.json()
 
 
 class Storage:
-    def __init__(self, base_url: str, headers: dict):
+    def __init__(self, base_url: str, headers: dict, client: httpx.Client):
         self._base_url = base_url
         self._headers = headers
+        self._client = client
 
     def from_(self, bucket: str) -> StorageBucket:
-        return StorageBucket(self._base_url, self._headers, bucket)
+        return StorageBucket(self._base_url, self._headers, bucket, self._client)
 
 
 # ── Auth ─────────────────────────────────────────────────────────────────────
 
 class Auth:
-    def __init__(self, base_url: str, headers: dict):
+    def __init__(self, base_url: str, headers: dict, client: httpx.Client):
         self._base_url = base_url
         self._headers = headers
+        self._client = client
 
     def sign_up(self, credentials: dict) -> AuthResult:
         payload = {
@@ -238,7 +243,7 @@ class Auth:
         if user_meta:
             payload["data"] = user_meta
 
-        resp = httpx.post(
+        resp = self._client.post(
             f"{self._base_url}/auth/v1/signup",
             headers=self._headers,
             json=payload,
@@ -259,7 +264,7 @@ class Auth:
         return AuthResult(user=user, session=session)
 
     def sign_in_with_password(self, credentials: dict) -> AuthResult:
-        resp = httpx.post(
+        resp = self._client.post(
             f"{self._base_url}/auth/v1/token?grant_type=password",
             headers=self._headers,
             json={
@@ -291,8 +296,9 @@ class SupabaseHTTPClient:
             "apikey":        service_key,
             "Authorization": f"Bearer {service_key}",
         }
-        self.auth    = Auth(self._url, self._headers)
-        self.storage = Storage(self._url, self._headers)
+        self._client = httpx.Client(timeout=_TIMEOUT)
+        self.auth    = Auth(self._url, self._headers, self._client)
+        self.storage = Storage(self._url, self._headers, self._client)
 
     def table(self, name: str) -> TableQuery:
-        return TableQuery(self._url, self._headers, name)
+        return TableQuery(self._url, self._headers, name, self._client)
