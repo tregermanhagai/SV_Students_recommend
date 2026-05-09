@@ -69,6 +69,7 @@ def register(body: UserRegister):
     "/login",
     response_model=UserOut,
     summary="Log in and receive a Bearer token",
+    responses={401: {"description": "Invalid email or password."}},
 )
 def login(body: UserLogin):
     """
