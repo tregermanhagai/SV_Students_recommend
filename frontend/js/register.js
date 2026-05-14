@@ -1,7 +1,22 @@
+// Set to true to re-enable the math security check on the registration form.
+const CAPTCHA_ENABLED = false;
+
 document.addEventListener('DOMContentLoaded', () => {
   if (isLoggedIn()) {
     window.location.href = 'home.html';
     return;
+  }
+
+  // ── CAPTCHA setup ─────────────────────────────────────────────
+  const captchaWrap = document.getElementById('captchaWrap');
+  let captchaAnswer = null;
+
+  if (CAPTCHA_ENABLED) {
+    captchaWrap.style.display = '';
+    const a = Math.floor(Math.random() * 9) + 1;
+    const b = Math.floor(Math.random() * 9) + 1;
+    captchaAnswer = a + b;
+    document.getElementById('captchaQuestion').textContent = `What is ${a} + ${b} ?`;
   }
 
   wirePasswordToggle('password');
@@ -38,6 +53,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!/^[\x20-\x7E]+$/.test(password)) return showError('Password must contain English characters only.');
     if (/_/.test(email.split('@')[0]))
       return showError('Email addresses with underscores are not supported. Please use a dot or remove the underscore (e.g. student1@… instead of student_1@…).');
+
+    if (CAPTCHA_ENABLED) {
+      const given = parseInt(document.getElementById('captchaInput').value, 10);
+      if (isNaN(given) || given !== captchaAnswer) {
+        return showError('Incorrect answer to the security check. Please try again.');
+      }
+    }
 
     const btn = form.querySelector('[data-test="btn-register"]');
     btn.disabled = true;
