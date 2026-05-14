@@ -4,22 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const params      = new URLSearchParams(window.location.search);
-  const skipCaptcha = params.get('skip_captcha') === 'true';
-
-  // ── CAPTCHA setup ─────────────────────────────────────────────
-  const captchaWrap = document.getElementById('captchaWrap');
-  let captchaAnswer = null;
-
-  if (skipCaptcha) {
-    captchaWrap.style.display = 'none';
-  } else {
-    const a = Math.floor(Math.random() * 9) + 1;
-    const b = Math.floor(Math.random() * 9) + 1;
-    captchaAnswer = a + b;
-    document.getElementById('captchaQuestion').textContent = `What is ${a} + ${b} ?`;
-  }
-
   wirePasswordToggle('password');
 
   // ── Form wiring ───────────────────────────────────────────────
@@ -54,13 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!/^[\x20-\x7E]+$/.test(password)) return showError('Password must contain English characters only.');
     if (/_/.test(email.split('@')[0]))
       return showError('Email addresses with underscores are not supported. Please use a dot or remove the underscore (e.g. student1@… instead of student_1@…).');
-
-    if (!skipCaptcha) {
-      const given = parseInt(document.getElementById('captchaInput').value, 10);
-      if (isNaN(given) || given !== captchaAnswer) {
-        return showError('Incorrect answer to the security check. Please try again.');
-      }
-    }
 
     const btn = form.querySelector('[data-test="btn-register"]');
     btn.disabled = true;
