@@ -16,15 +16,16 @@ async function loadCart() {
   }
 }
 
-async function persistCart() {
-  try {
-    await apiFetch('/api/cart', {
+// Serialize all PUTs — only one in flight at a time; each one sends the latest cartItems.
+let _persistChain = Promise.resolve();
+function persistCart() {
+  _persistChain = _persistChain.then(() =>
+    apiFetch('/api/cart', {
       method: 'PUT',
       body: JSON.stringify({ items: cartItems }),
-    });
-  } catch (err) {
-    console.error('Failed to save cart:', err);
-  }
+    }).catch(err => console.error('Failed to save cart:', err))
+  );
+  return _persistChain;
 }
 
 function updateCartIcon() {
@@ -70,13 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const originalText = button.textContent;
       button.textContent = 'Added!';
-      button.disabled = true;
-      setTimeout(() => {
-        button.textContent = originalText;
-        button.disabled = false;
-      }, 800);
+      setTimeout(() => { button.textContent = originalText; }, 800);
 
-      await persistCart();
+      persistCart();
     });
   });
 });
