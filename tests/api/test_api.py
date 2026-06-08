@@ -10,10 +10,10 @@ _state: dict = {}
 
 @pytest.fixture(scope="module")
 def api_context(playwright):
-    # ctx is a Playwright APIRequestContext — a reusable HTTP client with BASE_URL pre-set, shared across all tests in this module
-    ctx = playwright.request.new_context(base_url=BASE_URL)
-    yield ctx
-    ctx.dispose()
+    # api_context is a Playwright APIRequestContext — a reusable HTTP client with BASE_URL pre-set, shared across all tests in this module
+    api_context = playwright.request.new_context(base_url=BASE_URL)
+    yield api_context
+    api_context.dispose()
 
 
 @pytest.mark.api_tests
