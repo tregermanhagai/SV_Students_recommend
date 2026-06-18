@@ -30,6 +30,13 @@ HEADERS = {
 
 BUCKET = "recommendation-images"
 
+# Set to False to skip execution without changing the schedule
+ENABLED = True
+
+if not ENABLED:
+    print("[SKIP] Reset is disabled (ENABLED = False). Nothing was changed.")
+    sys.exit(0)
+
 # ── Step 1: fetch all existing recommendations ───────────────────────────────
 print("[1/4] Fetching all recommendations...")
 
