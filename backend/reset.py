@@ -8,6 +8,7 @@ Run from the backend/ directory (with .env present):
     python reset.py
 """
 
+import json
 import os
 import sys
 import uuid
@@ -29,10 +30,8 @@ HEADERS = {
 
 BUCKET = "recommendation-images"
 
-ADMIN_EMAIL = "admin@svcollege.co.il"
-
 # ── Step 1: fetch all existing recommendations ───────────────────────────────
-print("[1/4] Fetching all recommendations…")
+print("[1/4] Fetching all recommendations...")
 
 with httpx.Client() as client:
     resp = client.get(
@@ -42,14 +41,14 @@ with httpx.Client() as client:
     )
 
 if resp.status_code != 200:
-    print(f"  ✗ Failed to fetch recommendations {resp.status_code}: {resp.text}")
+    print(f"  [FAIL] Failed to fetch recommendations {resp.status_code}: {resp.text}")
     sys.exit(1)
 
 recommendations = resp.json()
-print(f"  → Found {len(recommendations)} recommendation(s)")
+print(f"  -> Found {len(recommendations)} recommendation(s)")
 
 # ── Step 2: delete storage images ────────────────────────────────────────────
-print("[2/4] Deleting storage images…")
+print("[2/4] Deleting storage images...")
 
 image_prefix = f"{SUPABASE_URL}/storage/v1/object/public/{BUCKET}/"
 storage_paths = []
@@ -60,21 +59,22 @@ for rec in recommendations:
 
 if storage_paths:
     with httpx.Client() as client:
-        del_resp = client.delete(
+        del_resp = client.request(
+            "DELETE",
             f"{SUPABASE_URL}/storage/v1/object/{BUCKET}",
             headers=HEADERS,
-            json={"prefixes": storage_paths},
+            content=json.dumps({"prefixes": storage_paths}),
         )
     if del_resp.status_code in (200, 204):
-        print(f"  ✓ Deleted {len(storage_paths)} image(s) from storage")
+        print(f"  [OK] Deleted {len(storage_paths)} image(s) from storage")
     else:
         # Non-fatal — continue even if some images are already gone
-        print(f"  ⚠ Storage delete returned {del_resp.status_code}: {del_resp.text}")
+        print(f"  [WARN] Storage delete returned {del_resp.status_code}: {del_resp.text}")
 else:
-    print("  → No images to delete")
+    print("  -> No images to delete")
 
 # ── Step 3: delete all recommendations (comments cascade via FK) ─────────────
-print("[3/4] Deleting all recommendations…")
+print("[3/4] Deleting all recommendations...")
 
 with httpx.Client() as client:
     del_resp = client.delete(
@@ -85,29 +85,27 @@ with httpx.Client() as client:
     )
 
 if del_resp.status_code in (200, 204):
-    print(f"  ✓ All recommendations deleted")
+    print(f"  [OK] All recommendations deleted")
 else:
-    print(f"  ✗ Delete failed {del_resp.status_code}: {del_resp.text}")
+    print(f"  [FAIL] Delete failed {del_resp.status_code}: {del_resp.text}")
     sys.exit(1)
 
 # ── Step 4: look up admin user id ─────────────────────────────────────────────
-print(f"[4/4] Inserting sample Movie recommendation…")
+print(f"[4/4] Inserting sample Movie recommendation...")
 
 with httpx.Client() as client:
-    list_resp = client.get(
-        f"{SUPABASE_URL}/auth/v1/admin/users",
+    profiles_resp = client.get(
+        f"{SUPABASE_URL}/rest/v1/profiles",
         headers=HEADERS,
-        params={"per_page": 200},
+        params={"is_admin": "eq.true", "select": "id", "limit": "1"},
     )
 
-users = list_resp.json().get("users", [])
-admin = next((u for u in users if u.get("email") == ADMIN_EMAIL), None)
-
-if not admin:
-    print(f"  ✗ Admin user '{ADMIN_EMAIL}' not found — run seed.py first")
+profiles = profiles_resp.json()
+if not profiles:
+    print("  [FAIL] No admin profile found - run seed.py first")
     sys.exit(1)
 
-admin_id = admin["id"]
+admin_id = profiles[0]["id"]
 
 # ── Step 4a: upload Shawshank.png ─────────────────────────────────────────────
 IMAGE_PATH = os.path.abspath(
@@ -137,10 +135,10 @@ with httpx.Client() as client:
 
 if upload_resp.status_code in (200, 201):
     image_url = f"{SUPABASE_URL}/storage/v1/object/public/{BUCKET}/{storage_path}"
-    print(f"  ✓ Image uploaded → {image_url}")
+    print(f"  [OK] Image uploaded -> {image_url}")
 else:
-    print(f"  ⚠ Image upload failed {upload_resp.status_code}: {upload_resp.text}")
-    print("    Continuing without image…")
+    print(f"  [WARN] Image upload failed {upload_resp.status_code}: {upload_resp.text}")
+    print("    Continuing without image...")
     image_url = None
 
 # ── Step 4b: insert the sample recommendation ─────────────────────────────────
@@ -167,9 +165,9 @@ with httpx.Client() as client:
     )
 
 if insert_resp.status_code in (200, 201):
-    print(f"  ✓ Sample recommendation inserted (id={rec_id})")
+    print(f"  [OK] Sample recommendation inserted (id={rec_id})")
 else:
-    print(f"  ✗ Insert failed {insert_resp.status_code}: {insert_resp.text}")
+    print(f"  [FAIL] Insert failed {insert_resp.status_code}: {insert_resp.text}")
     sys.exit(1)
 
-print("\n✅  Reset complete! 1 Movie recommendation left, all users preserved.")
+print("\n[DONE] Reset complete! 1 Movie recommendation left, all users preserved.")
