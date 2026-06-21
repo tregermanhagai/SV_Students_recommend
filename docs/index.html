@@ -182,7 +182,7 @@ code.inline{font-family:"JetBrains Mono",monospace;font-size:13px;background:#ef
     </ul>
     <div class="callout amber">
       <h4>Test accounts</h4>
-      <p><strong>Admin:</strong> <code class="inline">hagai@svcollege.co.il</code><br>
+      <p><strong>Admin:</strong> <code class="inline">admin@svcollege.co.il</code> &nbsp; <strong>Password:</strong> <code class="inline">test1234</code><br>
       <strong>Tip:</strong> create your own regular user via Register, using a unique email each run, e.g. <code class="inline">test_&lt;random&gt;@example.com</code>.</p>
     </div>
   </section>
@@ -391,7 +391,7 @@ def test_register_new_user(playwright: Playwright):
 
 def test_login_success(page: Page):
     page.goto(<span class="s">"https://sv-students-recommend.onrender.com/pages/login.html"</span>)
-    page.get_by_label(<span class="s">"Email"</span>).fill(<span class="s">"hagai@svcollege.co.il"</span>)
+    page.get_by_label(<span class="s">"Email"</span>).fill(<span class="s">"admin@svcollege.co.il"</span>)
     page.get_by_label(<span class="s">"Password"</span>).fill(<span class="s">"YOUR_PASSWORD"</span>)
     page.get_by_role(<span class="s">"button"</span>, name=<span class="s">"Sign In"</span>).click()
     expect(page).to_have_url(<span class="s">"**/home.html"</span>)</pre>
