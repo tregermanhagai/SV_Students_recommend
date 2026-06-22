@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  initCartIcon();
   // ── Handle Google OAuth callback ──────────────────────────────
   // Supabase redirects here with #access_token=... in the fragment
   const fragment   = new URLSearchParams(window.location.hash.slice(1));

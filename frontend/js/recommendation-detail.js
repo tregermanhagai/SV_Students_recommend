@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  initCartIcon();
   const params = new URLSearchParams(window.location.search);
   const recId  = params.get('id');
 

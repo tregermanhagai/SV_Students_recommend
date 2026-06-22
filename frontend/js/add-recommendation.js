@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   requireAuth();
+  initCartIcon();
 
   const form         = document.getElementById('addForm');
   const errorMsg     = document.getElementById('errorMsg');

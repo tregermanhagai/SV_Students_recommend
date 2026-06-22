@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
   requireAuth();
+  initCartIcon();
 
   if (!isAdmin()) {
     window.location.href = 'home.html';

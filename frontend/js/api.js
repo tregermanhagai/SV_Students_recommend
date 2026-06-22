@@ -60,3 +60,17 @@ function clearSession() {
   localStorage.removeItem('sv_token');
   localStorage.removeItem('sv_user');
 }
+
+async function initCartIcon() {
+  const navCart = document.getElementById('navCart');
+  if (!navCart) return;
+  try {
+    const data = await apiFetch('/api/cart');
+    const totalQty = (data.items || []).reduce((sum, i) => sum + i.quantity, 0);
+    const badge = document.getElementById('cartBadge');
+    if (badge) {
+      badge.textContent = String(totalQty);
+      badge.style.display = totalQty > 0 ? '' : 'none';
+    }
+  } catch (_) {}
+}

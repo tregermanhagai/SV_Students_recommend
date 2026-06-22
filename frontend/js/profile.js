@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   requireAuth();
+  initCartIcon();
 
   const user  = getUser();
   const token = localStorage.getItem('sv_token');
