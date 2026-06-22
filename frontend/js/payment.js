@@ -27,12 +27,9 @@ function updateCartIcon(items) {
   const badge = document.getElementById('cartBadge');
   if (!navCart) return;
   const totalQty = items.reduce((sum, i) => sum + i.quantity, 0);
-  if (totalQty > 0) {
-    navCart.style.display = '';
-    badge.textContent = String(totalQty);
-  } else {
-    navCart.style.display = 'none';
-  }
+  navCart.style.display = '';
+  badge.textContent = String(totalQty);
+  badge.style.display = totalQty > 0 ? '' : 'none';
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
