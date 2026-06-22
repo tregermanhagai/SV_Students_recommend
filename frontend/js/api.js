@@ -31,7 +31,7 @@ async function apiFetch(path, options = {}) {
 
   const response = await fetch(`${BASE_URL}${path}`, { ...options, headers });
 
-  if (response.status === 401) {
+  if (response.status === 401 && !options.skipAuthRedirect) {
     // Token expired or invalid — log the user out
     clearSession();
     window.location.href = '/pages/login.html';

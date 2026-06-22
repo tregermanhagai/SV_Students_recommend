@@ -63,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await apiFetch('/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
+        skipAuthRedirect: true,
       });
       // Save token first so apiFetch can use it for the profile request
       localStorage.setItem('sv_token', data.access_token);
@@ -73,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
       saveSession(data);
       window.location.href = 'home.html';
     } catch (err) {
-      showError(err.message || 'Invalid email or password.');
+      showError('Incorrect email or password. Please try again or use the Forgot password link.');
     } finally {
       btn.disabled = false;
       btn.textContent = 'Sign In';
