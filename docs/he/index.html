@@ -105,7 +105,9 @@ figure img{display:block;width:100%;height:auto}
     <a href="#func" class="sub">3.3 המלצות</a>
     <a href="#func" class="sub">3.4 פרופיל ומערכת</a>
     <a href="#func" class="sub">3.5 חנות ותשלום</a>
+    <a href="#func" class="sub">3.6 עוזר AI לסרטים</a>
     <a href="#pages">4. מדריך מסכים</a>
+    <a href="#pages" class="sub">4.10 עמוד עוזר AI לסרטים</a>
     <a href="#api">5. ממשק API</a>
   </nav>
 </aside>
@@ -120,7 +122,7 @@ figure img{display:block;width:100%;height:auto}
 
   <section id="intro">
     <h2>1. מבוא</h2>
-    <p class="lead">מסמך זה מגדיר את הדרישות של אפליקציית הווב “SV Students Recommend”. במערכת סטודנטים יכולים להתחבר, לשתף המלצות, להגיב ולדרג אותן, לרכוש מוצרים ממותגים של מכללת SV, ולנהל את הפרופיל האישי שלהם. למשתמשי אדמין יש הרשאות נוספות לניהול ופיקוח על הפלטפורמה.</p>
+    <p class=”lead”>מסמך זה מגדיר את הדרישות של אפליקציית הווב “SV Students Recommend”. במערכת סטודנטים יכולים להתחבר, לשתף המלצות, להגיב ולדרג אותן, לרכוש מוצרים ממותגים של מכללת SV, לשאול את עוזר ה-AI בנושא סרטים, ולנהל את הפרופיל האישי שלהם. למשתמשי אדמין יש הרשאות נוספות לניהול ופיקוח על הפלטפורמה.</p>
     <p>המסמך מתאר את המערכת ואת מה שכל יכולת צריכה לעשות. כל דרישה ממוספרת כדי שניתן יהיה להתייחס אליה במדויק.</p>
     <h3>1.1 מילון מונחים</h3>
     <div class="tablewrap"><table>
@@ -131,6 +133,8 @@ figure img{display:block;width:100%;height:auto}
         <tr><td class="name">API</td><td>נקודות הקצה בשרת שאיתן האתר מתקשר.</td></tr>
         <tr><td class="name">RBAC</td><td>בקרת גישה מבוססת תפקיד — הרשאות שונות לאדמין מול משתמש רגיל.</td></tr>
         <tr><td class="name">Token</td><td>מחרוזת סודית המוחזרת לאחר התחברות, ומשמשת לאימות בקריאות API מוגנות.</td></tr>
+        <tr><td class="name">TMDb</td><td>The Movie Database — שירות חינמי המספק מידע על סרטים, שחקנים, כרזות וטריילרים.</td></tr>
+        <tr><td class="name">OpenAI</td><td>חברת AI המספקת את מודל gpt-4o-mini לניסוח תשובות בשפה טבעית.</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -197,6 +201,19 @@ figure img{display:block;width:100%;height:auto}
     <p><strong>3.5.1 עמוד החנות:</strong> מציג מוצרים ממותגים של מכללת SV, לדוגמה חולצה (50 ש“ח) וכוס (20 ש“ח). לכל פריט כפתור “Add to cart”. מונה העגלה גדל כשמוסיפים פריט.</p>
     <p><strong>3.5.2 עמוד העגלה:</strong> המשתמש יכול להגדיל או להקטין כמות של כל פריט בעזרת כפתורי + ו−. המערכת חייבת לחשב מחדש את סכום השורה ואת סך הכול הכללי בצורה נכונה. המשתמש יכול להסיר פריט בעזרת כפתור “Remove”. כפתור “Proceed to Payment” מעביר לעמוד התשלום.</p>
     <p><strong>3.5.3 עמוד תשלום:</strong> מציג את סיכום ההזמנה ואת המחיר הכולל. שדות חובה — שם מלא, כתובת, מספר כרטיס אשראי, CVV / קוד סודי, תאריך תפוגה. כפתור “Place Order” שולח את ההזמנה. שדות חובה ריקים חייבים למנוע את השליחה.</p>
+
+    <h3>3.6 עוזר AI לסרטים</h3>
+    <p><strong>3.6.1 שאלת שאלה:</strong> המשתמש מקליד שאלה חופשית בתיבת טקסט (עד 500 תווים) ולוחץ “Ask AI”. השאלה נשלחת לשרת בקריאת <code class=”inline”>POST /api/movie-ai</code>. הלחיצה על Enter (ללא Shift) שולחת גם היא.</p>
+    <p><strong>3.6.2 שליפת מידע מ-TMDb:</strong> השרת מחפש את הסרט הרלוונטי ביותר ב-TMDb ושולף כרזה, ציון IMDb, במאי, 5 שחקנים ראשיים, ז'אנרים, משך, סקירה וקישור לטריילר ביוטיוב.</p>
+    <p><strong>3.6.3 תשובת AI:</strong> המידע מ-TMDb מועבר למודל gpt-4o-mini של OpenAI. המודל עונה <strong>בשפת השאלה</strong> (עברית, אנגלית וכו'). הפלט מוצג כ-Markdown מעובד.</p>
+    <p><strong>3.6.4 כרטיס סרט:</strong> מעל תשובת ה-AI מוצג כרטיס עם כרזת הסרט, כותרת (קישור ל-IMDb), שנה, ציון ⭐, במאי, שחקנים, וקישורים ל-IMDb ולטריילר.</p>
+    <p><strong>3.6.5 דחייה של שאלות שאינן על סרטים:</strong> אם השאלה לא קשורה לקולנוע, המודל מחזיר: “I can only answer questions related to movies.”</p>
+    <p><strong>3.6.6 הרשאות:</strong> העמוד דורש התחברות. ניסיון גישה ללא Token מפנה לדף הכניסה.</p>
+    <div class=”callout amber”>
+      <h4>שגרת Degradation מדורגת</h4>
+      <p>אם <code class=”inline”>TMDB_API_KEY</code> לא מוגדר — לא יוצג כרטיס סרט, אך תשובת ה-AI עדיין תוצג.</p>
+      <p>אם <code class=”inline”>OPENAI_API_KEY</code> לא מוגדר — יוצג כרטיס הסרט בלבד, ללא תשובת AI.</p>
+    </div>
   </section>
 
   <section id="pages">
@@ -293,6 +310,21 @@ figure img{display:block;width:100%;height:auto}
     <p class="note">© 2026 All rights reserved, קישור למכללת SV, וקישור נגישות.</p>
     <figure><img loading="lazy" src="data:image/jpeg;base64,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" alt="סרגל תחתון (Footer)"></figure>
   </div>
+
+  <div class="pageref">
+    <h3>4.10 עוזר AI לסרטים</h3>
+    <p class="urlline"><span class="lbl">URL</span> <a href="https://sv-students-recommend.onrender.com/pages/movie-ai.html" target="_blank" rel="noopener" dir="ltr">https://sv-students-recommend.onrender.com/pages/movie-ai.html</a></p>
+    <p class="note">עמוד ייעודי לשאילת שאלות על סרטים. מציג כרטיס סרט (כרזה, ציון IMDb, במאי, שחקנים, קישור לטריילר) ותשובת AI מנוסחת ב-Markdown בשפת המשתמש.</p>
+    <div class="callout">
+      <h4>רכיבים בעמוד</h4>
+      <ul>
+        <li><strong>תיבת טקסט</strong> — שאלה חופשית עד 500 תווים.</li>
+        <li><strong>כפתור "Ask AI"</strong> — שולח את השאלה לשרת. גם Enter שולח.</li>
+        <li><strong>כרטיס סרט</strong> — כרזה, כותרת, שנה, ⭐ ציון, ז'אנרים, במאי, שחקנים, קישורים ל-IMDb ולטריילר.</li>
+        <li><strong>תשובת AI</strong> — טקסט Markdown מעובד בשפת השאלה.</li>
+      </ul>
+    </div>
+  </div>
   </section>
 
   <section id="api">
@@ -313,9 +345,45 @@ figure img{display:block;width:100%;height:auto}
         <tr><td><span class="tag neg">DELETE</span></td><td><code class="inline">/api/recommendations/{rec_id}</code></td><td>כן</td><td>מחיקת ההמלצה שלך.</td></tr>
         <tr><td><span class="tag adm">GET</span></td><td><code class="inline">/api/recommendations/{rec_id}/comments</code></td><td>לא</td><td>קבלת תגובות להמלצה.</td></tr>
         <tr><td><span class="tag pos">POST</span></td><td><code class="inline">/api/recommendations/{rec_id}/comments</code></td><td>כן</td><td>הוספת תגובה ודירוג כוכבים.</td></tr>
+        <tr><td><span class="tag pos">POST</span></td><td><code class="inline">/api/movie-ai</code></td><td>כן</td><td>שאלת שאלה לעוזר ה-AI — מחזיר תשובת טקסט ונתוני סרט מ-TMDb.</td></tr>
       </tbody>
     </table></div>
-    <h3>5.2 קודי סטטוס נפוצים</h3>
+    <h3>5.2 בדיקת נקודת הקצה /api/movie-ai</h3>
+    <p>שלב 1 — קבלת Token:</p>
+    <pre style="background:#1c1c1a;color:#f7f4ec;padding:16px 20px;border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:13px;overflow-x:auto;direction:ltr;text-align:left">curl -X POST https://sv-students-recommend.onrender.com/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@svcollege.co.il", "password": "test1234"}'</pre>
+    <p>שלב 2 — שאילת שאלה:</p>
+    <pre style="background:#1c1c1a;color:#f7f4ec;padding:16px 20px;border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:13px;overflow-x:auto;direction:ltr;text-align:left">curl -X POST https://sv-students-recommend.onrender.com/api/movie-ai \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -H "Content-Type: application/json" \
+  -d '{"question": "Tell me about The Shawshank Redemption"}'</pre>
+    <p>מבנה התגובה:</p>
+    <pre style="background:#1c1c1a;color:#f7f4ec;padding:16px 20px;border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:13px;overflow-x:auto;direction:ltr;text-align:left">{
+  "answer": "**The Shawshank Redemption** is widely regarded as...",
+  "movie": {
+    "title": "The Shawshank Redemption",
+    "year": "1994",
+    "rating": 8.7,
+    "genres": ["Drama", "Crime"],
+    "directors": ["Frank Darabont"],
+    "cast": ["Tim Robbins", "Morgan Freeman"],
+    "imdb_url": "https://www.imdb.com/title/tt0111161/",
+    "trailer_url": "https://www.youtube.com/watch?v=..."
+  }
+}</pre>
+    <div class="tablewrap"><table>
+      <thead><tr><th>בדיקה</th><th>שאלה לדוגמה</th><th>התנהגות צפויה</th></tr></thead>
+      <tbody>
+        <tr><td>שליפת סרט</td><td><code class="inline">Tell me about Inception</code></td><td>כרטיס סרט + תשובת AI</td></tr>
+        <tr><td>שאלה על שחקן</td><td><code class="inline">Who is Morgan Freeman?</code></td><td>תשובת AI על קריירת השחקן</td></tr>
+        <tr><td>שאלה בעברית</td><td><code class="inline">ספר לי על שינדלר</code></td><td>תגובה בעברית</td></tr>
+        <tr><td>דחיית שאלה לא קשורה</td><td><code class="inline">What is the capital of France?</code></td><td>"I can only answer questions related to movies."</td></tr>
+        <tr><td>שאלה ריקה</td><td><code class="inline">""</code></td><td>HTTP 422 Unprocessable Entity</td></tr>
+        <tr><td>ללא Token</td><td>כל שאלה</td><td>HTTP 401 Unauthorized</td></tr>
+      </tbody>
+    </table></div>
+    <h3>5.3 קודי סטטוס נפוצים</h3>
     <div class="tablewrap"><table>
       <thead><tr><th>קוד</th><th>משמעות</th><th>מתי מצפים לו</th></tr></thead>
       <tbody>
