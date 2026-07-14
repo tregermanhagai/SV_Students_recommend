@@ -40,12 +40,56 @@ TMDB_FULL   = "https://image.tmdb.org/t/p/w500"
 # ── Request / response models ────────────────────────────────────────────────
 
 class MovieAIRequest(BaseModel):
-    question: str = Field(..., min_length=1, max_length=500)
+    question: str = Field(
+        ...,
+        min_length=1,
+        max_length=500,
+        examples=["Tell me about The Shawshank Redemption"],
+        description="A movie-related question in any language (max 500 characters).",
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {"question": "Tell me about The Shawshank Redemption"},
+                {"question": "Who directed Inception?"},
+                {"question": "ספר לי על הסרט שינדלר"},
+            ]
+        }
+    }
+
+
+class MovieDict(BaseModel):
+    title: str | None = Field(None, description="Movie title")
+    year: str | None = Field(None, description="Release year (4-digit string)")
+    rating: float | None = Field(None, description="TMDb average vote (0–10)")
+    genres: list[str] | None = Field(None, description="List of genre names")
+    runtime: int | None = Field(None, description="Runtime in minutes")
+    directors: list[str] | None = Field(None, description="Director name(s)")
+    cast: list[str] | None = Field(None, description="Top 5 cast members")
+    overview: str | None = Field(None, description="Short plot summary")
+    poster_url: str | None = Field(None, description="TMDb poster image URL (w342)")
+    poster_full: str | None = Field(None, description="TMDb poster image URL (w500)")
+    imdb_id: str | None = Field(None, description="IMDb title ID (e.g. tt0111161)")
+    imdb_url: str | None = Field(None, description="Full IMDb title URL")
+    trailer_url: str | None = Field(None, description="YouTube trailer URL")
 
 
 class MovieAIResponse(BaseModel):
-    answer: str | None
-    movie: dict | None
+    answer: str | None = Field(
+        None,
+        description=(
+            "AI-generated answer in the same language as the question, "
+            "formatted as Markdown. `null` when OPENAI_API_KEY is not configured."
+        ),
+    )
+    movie: MovieDict | None = Field(
+        None,
+        description=(
+            "Enriched movie data from TMDb (poster, cast, rating, trailer, IMDb link). "
+            "`null` when no matching movie was found or TMDB_API_KEY is not configured."
+        ),
+    )
 
 
 # ── TMDb helpers ─────────────────────────────────────────────────────────────
@@ -190,7 +234,59 @@ def _call_openai(question: str, context: str, api_key: str) -> str:
 
 # ── Endpoint ──────────────────────────────────────────────────────────────────
 
-@router.post("/movie-ai", response_model=MovieAIResponse)
+@router.post(
+    "/movie-ai",
+    response_model=MovieAIResponse,
+    summary="Ask the Movie AI Assistant",
+    description="""
+Ask any question about movies, actors, directors, or get recommendations.
+
+**Flow:**
+1. The backend searches [TMDb](https://www.themoviedb.org/) for the most relevant movie.
+2. Enriched context (poster, cast, rating, trailer) is passed to **OpenAI gpt-4o-mini**.
+3. The model responds **in the same language as the question** (Hebrew, English, etc.).
+
+**Graceful degradation:**
+- `TMDB_API_KEY` missing → `movie` field is `null`, AI answer still returned.
+- `OPENAI_API_KEY` missing → `answer` field is `null`, movie card still returned.
+- Both missing → HTTP 503.
+
+**Off-topic rejection:** if the question is unrelated to cinema the model replies:
+`"I can only answer questions related to movies."`
+
+**Auth:** Bearer token required (obtain via `POST /auth/login`).
+""",
+    responses={
+        200: {
+            "description": "AI answer and/or movie card returned successfully.",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "answer": "**The Shawshank Redemption** (1994) is widely regarded as one of the greatest films ever made...",
+                        "movie": {
+                            "title": "The Shawshank Redemption",
+                            "year": "1994",
+                            "rating": 8.7,
+                            "genres": ["Drama", "Crime"],
+                            "runtime": 142,
+                            "directors": ["Frank Darabont"],
+                            "cast": ["Tim Robbins", "Morgan Freeman", "Bob Gunton", "William Sadler", "Clancy Brown"],
+                            "overview": "Framed in the 1940s for the double murder of his wife and her lover...",
+                            "poster_url": "https://image.tmdb.org/t/p/w342/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
+                            "poster_full": "https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
+                            "imdb_id": "tt0111161",
+                            "imdb_url": "https://www.imdb.com/title/tt0111161/",
+                            "trailer_url": "https://www.youtube.com/watch?v=6hB3S9bIaco",
+                        },
+                    }
+                }
+            },
+        },
+        401: {"description": "Missing or invalid Bearer token."},
+        422: {"description": "Question is empty or exceeds 500 characters."},
+        503: {"description": "Neither TMDB_API_KEY nor OPENAI_API_KEY is configured."},
+    },
+)
 async def movie_ai(
     body: MovieAIRequest,
     current_user: dict = Depends(get_current_user),
