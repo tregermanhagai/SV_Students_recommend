@@ -3,6 +3,7 @@
 A practice sandbox application for SV College students to learn:
 - **End-to-end (E2E) testing** using Playwright, Python, and Pytest
 - **REST API testing** using Bearer token authentication
+- **AI-powered features** — Movie AI Assistant powered by OpenAI + TMDb
 
 ## Production
 
@@ -12,6 +13,7 @@ A practice sandbox application for SV College students to learn:
 |------|-----|
 | Login | https://sv-students-recommend.onrender.com/pages/login.html |
 | Home feed | https://sv-students-recommend.onrender.com/pages/home.html |
+| Movie AI Assistant | https://sv-students-recommend.onrender.com/pages/movie-ai.html |
 | API docs (Swagger) | https://sv-students-recommend.onrender.com/docs |
 | Accessibility statement | https://sv-students-recommend.onrender.com/accessibility.html |
 
@@ -21,7 +23,7 @@ A practice sandbox application for SV College students to learn:
 
 | Field    | Value                    |
 |----------|--------------------------|
-| Email    | hagai@svcollege.co.il    |
+| Email    | admin@svcollege.co.il    |
 | Password | test1234                 |
 
 Run `python backend/seed.py` to create this account and load the sample data.
@@ -45,7 +47,7 @@ Run `python backend/seed.py` to create this account and load the sample data.
 ```bash
 cd backend
 cp .env.example .env
-# Fill in your Supabase credentials in .env
+# Fill in your Supabase credentials and API keys in .env
 
 python -m venv venv
 source venv/bin/activate   # Windows: venv\Scripts\activate
@@ -89,8 +91,94 @@ const SUPABASE_ANON = 'your-anon-key';
 | POST | `/api/recommendations/{id}/comments` | ✓ | Add comment |
 | GET | `/api/profile/me` | ✓ | Get profile |
 | GET | `/api/profile/token` | ✓ | Get Bearer token |
+| POST | `/api/movie-ai` | ✓ | Ask Movie AI Assistant |
 
 Full interactive docs at `/docs` (Swagger UI).
+
+---
+
+## Movie AI Assistant
+
+The Movie AI page (`/pages/movie-ai.html`) lets logged-in users ask any question about movies, actors, or directors. The backend:
+
+1. Searches **TMDb** for the most relevant movie and fetches poster, cast, genres, runtime, and trailer
+2. Passes the enriched context to **OpenAI gpt-4o-mini** with a cinema-expert system prompt
+3. Returns a structured JSON response with an AI-written answer and a movie info card
+
+The assistant responds in the same language as the question (Hebrew, English, etc.) and refuses off-topic questions.
+
+### Required environment variables
+
+| Variable | Where to get |
+|----------|-------------|
+| `TMDB_API_KEY` | themoviedb.org → Settings → API → API Key |
+| `OPENAI_API_KEY` | platform.openai.com → API Keys |
+
+### Testing the Movie AI endpoint with curl
+
+**Step 1 — Get a Bearer token:**
+```bash
+curl -X POST https://sv-students-recommend.onrender.com/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@svcollege.co.il", "password": "test1234"}'
+```
+Copy the `access_token` from the response.
+
+**Step 2 — Ask a movie question:**
+```bash
+curl -X POST https://sv-students-recommend.onrender.com/api/movie-ai \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -H "Content-Type: application/json" \
+  -d '{"question": "Tell me about The Shawshank Redemption"}'
+```
+
+**Expected response shape:**
+```json
+{
+  "answer": "**The Shawshank Redemption** (1994) is widely regarded as one of the greatest films ever made...",
+  "movie": {
+    "title": "The Shawshank Redemption",
+    "year": "1994",
+    "rating": 8.7,
+    "genres": ["Drama", "Crime"],
+    "runtime": 142,
+    "directors": ["Frank Darabont"],
+    "cast": ["Tim Robbins", "Morgan Freeman", "Bob Gunton", "William Sadler", "Clancy Brown"],
+    "overview": "Framed in the 1940s for the double murder of his wife and her lover...",
+    "poster_url": "https://image.tmdb.org/t/p/w342/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
+    "imdb_url": "https://www.imdb.com/title/tt0111161/",
+    "trailer_url": "https://www.youtube.com/watch?v=6hB3S9bIaco"
+  }
+}
+```
+
+**Test cases to verify:**
+
+| Test | Question | Expected behavior |
+|------|----------|-------------------|
+| Movie lookup | `"Tell me about Inception"` | Movie card + AI answer |
+| Actor question | `"Who is Morgan Freeman?"` | AI answer about his career |
+| Hebrew question | `"ספר לי על הסרט שינדלר"` | Response in Hebrew |
+| Off-topic rejection | `"What is the capital of France?"` | `"I can only answer questions related to movies."` |
+| Empty question | `""` | HTTP 422 Unprocessable Entity |
+
+**Testing with Python (httpx):**
+```python
+import httpx
+
+BASE_URL = "https://sv-students-recommend.onrender.com"
+
+# 1. Login
+resp = httpx.post(f"{BASE_URL}/auth/login", json={"email": "admin@svcollege.co.il", "password": "test1234"})
+token = resp.json()["access_token"]
+
+# 2. Ask Movie AI
+headers = {"Authorization": f"Bearer {token}"}
+resp = httpx.post(f"{BASE_URL}/api/movie-ai", json={"question": "Tell me about The Godfather"}, headers=headers)
+data = resp.json()
+print(data["answer"])
+print(data["movie"]["title"], data["movie"]["rating"])
+```
 
 ## Registration CAPTCHA
 
@@ -163,11 +251,21 @@ pytest tests/sanity/test_create_recommendation.py::test_student_cannot_delete_ot
 ## Project Structure
 ```
 SV_Students_recommend/
-├── backend/         FastAPI Python backend
-├── frontend/        Vanilla HTML/CSS/JS frontend
+├── backend/
+│   ├── routers/
+│   │   ├── movie_ai.py   POST /api/movie-ai (TMDb + OpenAI)
+│   │   └── ...
+│   ├── main.py
+│   ├── config.py
+│   └── requirements.txt
+├── frontend/
 │   ├── assets/      CSS, images
-│   ├── pages/       HTML pages
-│   └── js/          JavaScript modules
+│   ├── pages/
+│   │   ├── movie-ai.html   Movie AI Assistant page
+│   │   └── ...
+│   └── js/
+│       ├── movie-ai.js     Movie AI frontend logic
+│       └── ...
 ├── supabase/        Database SQL setup script
 └── tests/           Playwright + Pytest test suite
     └── sanity/      Sanity / smoke tests
