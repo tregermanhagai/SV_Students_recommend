@@ -104,27 +104,89 @@ def _tmdb_get(path: str, params: dict, api_key: str) -> dict | None:
             )
         if resp.status_code == 200:
             return resp.json()
-    except Exception:
-        pass
+        print(f"[TMDb] {path} returned HTTP {resp.status_code}: {resp.text[:200]}")
+    except Exception as exc:
+        print(f"[TMDb] request to {path} failed: {exc}")
     return None
+
+
+def _fetch_tv_context(tv_id: int, api_key: str) -> tuple[str, dict | None]:
+    """Fetch TV show details from TMDb and return (context, movie_dict)."""
+    detail = _tmdb_get(
+        f"/tv/{tv_id}",
+        {"append_to_response": "credits,videos", "language": "en-US"},
+        api_key,
+    )
+    if not detail:
+        return "", None
+
+    title    = detail.get("name", "")
+    year     = (detail.get("first_air_date") or "")[:4]
+    rating   = detail.get("vote_average")
+    overview = detail.get("overview", "")
+    genres   = [g["name"] for g in detail.get("genres", [])]
+    poster   = detail.get("poster_path", "")
+
+    crew       = detail.get("credits", {}).get("crew", [])
+    directors  = [p["name"] for p in crew if p.get("job") in ("Director", "Executive Producer")][:3]
+    cast       = detail.get("credits", {}).get("cast", [])[:5]
+    cast_names = [p["name"] for p in cast]
+
+    videos      = detail.get("videos", {}).get("results", [])
+    trailer     = next((v for v in videos if v.get("type") == "Trailer" and v.get("site") == "YouTube"), None)
+    trailer_url = f"https://www.youtube.com/watch?v={trailer['key']}" if trailer else ""
+
+    ext = _tmdb_get(f"/tv/{tv_id}/external_ids", {}, api_key) or {}
+    imdb_id = ext.get("imdb_id", "")
+
+    context_lines = [
+        f"TV Show: {title} ({year})",
+        f"Rating: {rating}/10" if rating else "",
+        f"Genres: {', '.join(genres)}" if genres else "",
+        f"Cast: {', '.join(cast_names)}" if cast_names else "",
+        f"Overview: {overview}" if overview else "",
+        f"Trailer: {trailer_url}" if trailer_url else "",
+        f"IMDb: https://www.imdb.com/title/{imdb_id}/" if imdb_id else "",
+    ]
+    context = "\n".join(line for line in context_lines if line)
+
+    movie_dict = {
+        "title":       title,
+        "year":        year,
+        "rating":      rating,
+        "genres":      genres,
+        "runtime":     None,
+        "directors":   directors,
+        "cast":        cast_names,
+        "overview":    overview,
+        "poster_url":  f"{TMDB_IMAGE}{poster}" if poster else None,
+        "poster_full": f"{TMDB_FULL}{poster}" if poster else None,
+        "imdb_id":     imdb_id,
+        "imdb_url":    f"https://www.imdb.com/title/{imdb_id}/" if imdb_id else None,
+        "trailer_url": trailer_url or None,
+    }
+    return context, movie_dict
 
 
 def _fetch_movie_context(question: str, api_key: str) -> tuple[str, dict | None]:
     """
-    Search TMDb for the most relevant movie, enrich with credits+videos.
+    Search TMDb for the most relevant movie or TV show, enrich with credits+videos.
     Returns (context_string, movie_dict_for_frontend).
     """
     search = _tmdb_get("/search/multi", {"query": question, "language": "en-US", "page": 1}, api_key)
     if not search:
+        print(f"[TMDb] search returned no data for question: {question[:80]}")
         return "", None
 
-    # Pick the top movie result (skip person/tv for primary card)
     results = search.get("results", [])
+    print(f"[TMDb] search '{question[:60]}' → {len(results)} results, types: {[r.get('media_type') for r in results[:5]]}")
+
     movie_hit = next((r for r in results if r.get("media_type") == "movie"), None)
+    tv_hit    = next((r for r in results if r.get("media_type") == "tv"), None)
     person_hit = next((r for r in results if r.get("media_type") == "person"), None)
 
-    # If asking about a person and no movie found, use person's movie credits
-    if not movie_hit and person_hit:
+    # If asking about a person and no movie/tv found, use person's movie credits
+    if not movie_hit and not tv_hit and person_hit:
         credits = _tmdb_get(f"/person/{person_hit['id']}/movie_credits", {}, api_key)
         if credits:
             cast_movies = sorted(credits.get("cast", []), key=lambda m: m.get("popularity", 0), reverse=True)
@@ -135,20 +197,31 @@ def _fetch_movie_context(question: str, api_key: str) -> tuple[str, dict | None]
             )
             return context, None
 
-    if not movie_hit:
+    # Prefer movie over TV; fall back to TV if no movie found
+    if movie_hit:
+        media_type = "movie"
+        hit = movie_hit
+    elif tv_hit:
+        media_type = "tv"
+        hit = tv_hit
+    else:
+        print(f"[TMDb] no movie or TV hit in results")
         return "", None
 
-    movie_id = movie_hit["id"]
+    item_id = hit["id"]
 
+    if media_type == "tv":
+        return _fetch_tv_context(item_id, api_key)
+
+    # ── Movie path ────────────────────────────────────────────────────────────
     # Enrich with credits + videos in one call
     detail = _tmdb_get(
-        f"/movie/{movie_id}",
+        f"/movie/{item_id}",
         {"append_to_response": "credits,videos", "language": "en-US"},
         api_key,
     )
     if not detail:
-        # Fallback: use search result only
-        detail = movie_hit
+        detail = hit
 
     # Extract key fields
     title     = detail.get("title", "")
