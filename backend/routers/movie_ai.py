@@ -168,18 +168,33 @@ def _fetch_tv_context(tv_id: int, api_key: str) -> tuple[str, dict | None]:
     return context, movie_dict
 
 
+def _search_multi(question: str, api_key: str) -> list[dict]:
+    """
+    Try progressively shorter queries (dropping words from the end) until
+    TMDb returns results. This handles conversational questions like
+    "The Untouchables De palma" where extra words return 0 results.
+    """
+    words = question.split()
+    for n in range(min(len(words), 8), 0, -1):
+        query = " ".join(words[:n])
+        data = _tmdb_get("/search/multi", {"query": query, "language": "en-US", "page": 1}, api_key)
+        if data and data.get("results"):
+            print(f"[TMDb] query '{query}' → {len(data['results'])} results")
+            return data["results"]
+    print(f"[TMDb] no results found for any variant of: {question[:80]}")
+    return []
+
+
 def _fetch_movie_context(question: str, api_key: str) -> tuple[str, dict | None]:
     """
     Search TMDb for the most relevant movie or TV show, enrich with credits+videos.
     Returns (context_string, movie_dict_for_frontend).
     """
-    search = _tmdb_get("/search/multi", {"query": question, "language": "en-US", "page": 1}, api_key)
-    if not search:
-        print(f"[TMDb] search returned no data for question: {question[:80]}")
+    results = _search_multi(question, api_key)
+    if not results:
         return "", None
 
-    results = search.get("results", [])
-    print(f"[TMDb] search '{question[:60]}' → {len(results)} results, types: {[r.get('media_type') for r in results[:5]]}")
+    print(f"[TMDb] top result types: {[r.get('media_type') for r in results[:5]]}")
 
     movie_hit = next((r for r in results if r.get("media_type") == "movie"), None)
     tv_hit    = next((r for r in results if r.get("media_type") == "tv"), None)
