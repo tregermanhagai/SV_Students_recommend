@@ -17,14 +17,20 @@ const PRODUCTS: Product[] = [
 
 export default function StorePage() {
   const navigate = useNavigate()
-  useLocale()
+  const { t } = useLocale()
   const [cart, setCart] = useState<Record<string, number>>({})
   const [added, setAdded] = useState<string | null>(null)
+  const [ordered, setOrdered] = useState(false)
 
   function addToCart(id: string) {
     setCart(c => ({ ...c, [id]: (c[id] ?? 0) + 1 }))
     setAdded(id)
     setTimeout(() => setAdded(null), 1200)
+  }
+
+  function handleCheckout() {
+    setOrdered(true)
+    setCart({})
   }
 
   const total = Object.entries(cart).reduce((sum, [id, qty]) => {
@@ -77,7 +83,17 @@ export default function StorePage() {
           ))}
         </div>
 
-        {total > 0 && (
+        {ordered && (
+          <div className="card-surface p-6 flex flex-col items-center gap-3 text-center">
+            <span className="text-5xl">🎉</span>
+            <p className="text-white font-semibold">{t('checkoutSuccess')}</p>
+            <button onClick={() => setOrdered(false)} className="btn-accent w-full mt-2">
+              {t('back')}
+            </button>
+          </div>
+        )}
+
+        {!ordered && total > 0 && (
           <div className="card-surface p-4 space-y-3">
             <h2 className="text-white font-semibold">Cart</h2>
             {Object.entries(cart).map(([id, qty]) => {
@@ -93,7 +109,7 @@ export default function StorePage() {
               <span className="text-white">Total</span>
               <span className="text-accent">{total} ₪</span>
             </div>
-            <button className="btn-accent w-full">Checkout (demo)</button>
+            <button onClick={handleCheckout} className="btn-accent w-full">{t('checkout')}</button>
           </div>
         )}
       </div>

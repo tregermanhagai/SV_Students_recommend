@@ -54,6 +54,10 @@ export const translations = {
     commentPlaceholder: 'Share your thoughts…',
     addedBy: 'Added by',
     noComments: 'No comments yet.',
+    store: 'Store',
+    checkoutSuccess: 'Order placed! We\'ll be in touch soon.',
+    clearCart: 'Clear cart',
+    checkout: 'Checkout (demo)',
   },
   he: {
     home: 'בית',
@@ -110,6 +114,10 @@ export const translations = {
     commentPlaceholder: 'שתף את דעתך…',
     addedBy: 'נוסף על ידי',
     noComments: 'אין תגובות עדיין.',
+    store: 'חנות',
+    checkoutSuccess: '!ההזמנה נשלחה! ניצור איתך קשר בקרוב',
+    clearCart: 'נקה עגלה',
+    checkout: 'לתשלום (הדגמה)',
   },
 } as const
 
