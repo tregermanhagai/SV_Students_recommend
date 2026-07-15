@@ -253,7 +253,11 @@ export default function ProfilePage() {
             {/* About */}
             {modal === 'about' && (
               <>
-                <h2 className="text-white font-bold text-lg">ℹ️ About</h2>
+                <div className="flex flex-col items-center gap-1 pb-2">
+                  <img src="/sv_logo.png" alt="SV Recommend" className="w-16 h-16 rounded-2xl object-contain" />
+                  <h2 className="text-white font-bold text-lg mt-1">SV Recommend</h2>
+                  <p className="text-slate-400 text-xs">גרסה {__APP_VERSION__}</p>
+                </div>
                 <p className="text-slate-300 text-sm leading-relaxed">
                   <strong className="text-white">SV Students Recommend</strong> is a sandbox application
                   built for <strong className="text-white">SV College</strong> students to practice
