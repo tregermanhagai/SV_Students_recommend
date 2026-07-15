@@ -11,15 +11,15 @@ export default function ProfilePage() {
   const navigate = useNavigate()
   const [myRecs, setMyRecs] = useState<Recommendation[]>([])
   const [editingName, setEditingName] = useState(false)
-  const [name, setName] = useState(profile?.full_name ?? '')
+  const [name, setName] = useState(profile?.name ?? '')
 
   useEffect(() => {
-    setName(profile?.full_name ?? '')
+    setName(profile?.name ?? '')
     if (user) {
       supabase
         .from('recommendations')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('created_by', user.id)
         .order('created_at', { ascending: false })
         .then(({ data }) => setMyRecs(data ?? []))
     }
@@ -27,7 +27,7 @@ export default function ProfilePage() {
 
   async function saveName() {
     if (!user) return
-    await supabase.from('profiles').upsert({ id: user.id, full_name: name })
+    await supabase.from('profiles').upsert({ id: user.id, name })
     setEditingName(false)
   }
 
@@ -36,7 +36,7 @@ export default function ProfilePage() {
     navigate('/login', { replace: true })
   }
 
-  const initials = (profile?.full_name ?? user?.email ?? '?')
+  const initials = (profile?.name ?? user?.email ?? '?')
     .split(' ')
     .map(w => w[0])
     .join('')
@@ -46,7 +46,6 @@ export default function ProfilePage() {
   return (
     <div className="flex flex-col h-full overflow-y-auto pb-24">
       <div className="px-4 py-6 space-y-6">
-        {/* Avatar + name */}
         <div className="flex flex-col items-center gap-3">
           <div className="w-20 h-20 rounded-full bg-accent/20 text-accent text-2xl font-bold flex items-center justify-center">
             {initials}
@@ -65,7 +64,7 @@ export default function ProfilePage() {
             </div>
           ) : (
             <div className="text-center">
-              <p className="text-white font-semibold text-lg">{profile?.full_name ?? '—'}</p>
+              <p className="text-white font-semibold text-lg">{profile?.name ?? '—'}</p>
               <button onClick={() => setEditingName(true)} className="text-accent text-xs mt-0.5">
                 {t('editName')}
               </button>
@@ -75,7 +74,6 @@ export default function ProfilePage() {
           <p className="text-slate-400 text-sm">{user?.email}</p>
         </div>
 
-        {/* Language toggle */}
         <div className="card-surface p-4 flex items-center justify-between">
           <span className="text-white text-sm">{t('language')}</span>
           <div className="flex gap-2">
@@ -94,7 +92,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* My recommendations */}
         <div>
           <h2 className="text-slate-400 text-xs uppercase tracking-wide mb-3">{t('myRecommendations')}</h2>
           {myRecs.length === 0 ? (
@@ -107,16 +104,14 @@ export default function ProfilePage() {
                   onClick={() => navigate(`/recommendations/${rec.id}`)}
                   className="card-surface w-full p-3 flex items-center gap-3 text-left active:opacity-80"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-white/5 overflow-hidden shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-white/5 overflow-hidden shrink-0 flex items-center justify-center">
                     {rec.image_url
                       ? <img src={rec.image_url} alt="" className="w-full h-full object-cover" />
-                      : <span className="w-full h-full flex items-center justify-center text-lg">
-                          {categoryEmoji(rec.category)}
-                        </span>
+                      : <span className="text-lg">{categoryEmoji(rec.category)}</span>
                     }
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-medium truncate">{rec.title}</p>
+                    <p className="text-white text-sm font-medium truncate">{rec.name}</p>
                     <p className="text-slate-400 text-xs">{rec.category}</p>
                   </div>
                   <span className="text-slate-500">›</span>
@@ -126,7 +121,6 @@ export default function ProfilePage() {
           )}
         </div>
 
-        {/* Sign out */}
         <button
           onClick={signOut}
           className="w-full py-3 rounded-2xl border border-red-500/30 text-red-400 text-sm font-medium active:opacity-70"

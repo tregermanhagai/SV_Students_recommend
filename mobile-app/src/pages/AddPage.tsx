@@ -20,9 +20,9 @@ export default function AddPage() {
 
   const [form, setForm] = useState({
     category: 'Movie' as Recommendation['category'],
-    title: '',
-    recommender: '',
-    url: '',
+    name: '',
+    recommender_name: '',
+    website_link: '',
     description: '',
   })
   const [imageUrl, setImageUrl] = useState('')
@@ -37,16 +37,16 @@ export default function AddPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!user) return
-    if (!form.title.trim()) { setError('Title is required'); return }
+    if (!form.name.trim()) { setError('Title is required'); return }
     setSubmitting(true)
     setError('')
     const { error: dbErr } = await supabase.from('recommendations').insert({
-      user_id: user.id,
+      created_by: user.id,
       category: form.category,
-      title: form.title.trim(),
-      recommender: form.recommender.trim(),
-      url: form.url.trim() || null,
-      description: form.description.trim(),
+      name: form.name.trim(),
+      recommender_name: form.recommender_name.trim(),
+      website_link: form.website_link.trim() || null,
+      description: form.description.trim() || null,
       image_url: imageUrl || null,
     })
     setSubmitting(false)
@@ -60,7 +60,6 @@ export default function AddPage() {
         <h1 className="text-white text-xl font-bold">{t('addRecommendation')}</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Category */}
           <div className="space-y-2">
             <label className="text-slate-400 text-xs uppercase tracking-wide">{t('category')}</label>
             <div className="flex flex-wrap gap-2">
@@ -76,18 +75,17 @@ export default function AddPage() {
             </div>
           </div>
 
-          {/* Image */}
           <ImageUploader onUploaded={setImageUrl} />
 
           <input className="input-base" type="text" placeholder={t('title')}
-            value={form.title} onChange={set('title')} required />
+            value={form.name} onChange={set('name')} required />
           <input className="input-base" type="text" placeholder={t('recommenderName')}
-            value={form.recommender} onChange={set('recommender')} required />
+            value={form.recommender_name} onChange={set('recommender_name')} required />
           <input className="input-base" type="url" placeholder={t('url')}
-            value={form.url} onChange={set('url')} />
+            value={form.website_link} onChange={set('website_link')} />
           <textarea className="input-base resize-none" rows={4}
             placeholder={t('descriptionPlaceholder')}
-            value={form.description} onChange={set('description')} required />
+            value={form.description} onChange={set('description')} />
 
           {error && <p className="text-red-400 text-sm">{error}</p>}
 

@@ -23,7 +23,7 @@ export default function RecommendationCard({ rec, commentCount = 0 }: Props) {
         {rec.image_url ? (
           <img
             src={rec.image_url}
-            alt={rec.title}
+            alt={rec.name}
             className="w-full h-full object-cover"
             loading="lazy"
           />
@@ -37,7 +37,7 @@ export default function RecommendationCard({ rec, commentCount = 0 }: Props) {
       <div className="p-3 space-y-1">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-white font-semibold text-sm leading-tight line-clamp-2 flex-1">
-            {rec.title}
+            {rec.name}
           </h3>
           <span className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-medium ${categoryStyles[rec.category]}`}>
             {rec.category}
@@ -45,7 +45,7 @@ export default function RecommendationCard({ rec, commentCount = 0 }: Props) {
         </div>
 
         <p className="text-slate-400 text-xs">
-          {t('by')} {rec.recommender}
+          {t('by')} {rec.recommender_name}
         </p>
 
         <p className="text-slate-500 text-xs">

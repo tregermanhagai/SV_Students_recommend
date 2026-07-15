@@ -1,29 +1,30 @@
 export interface Recommendation {
   id: string
-  user_id: string
+  created_by: string | null
   category: 'Book' | 'Movie' | 'Series' | 'Activity' | 'Other'
-  title: string
-  recommender: string
-  url: string | null
-  description: string
+  name: string
+  recommender_name: string
+  website_link: string | null
+  description: string | null
   image_url: string | null
   created_at: string
+  updated_at: string
 }
 
 export interface Comment {
   id: string
   recommendation_id: string
-  user_id: string
-  author_name: string
-  body: string
+  commenter_id: string | null
+  commenter_name: string
+  comment_text: string | null
   rating: number
   created_at: string
 }
 
 export interface Profile {
   id: string
-  full_name: string | null
-  avatar_url: string | null
+  name: string | null
+  is_admin: boolean
   created_at: string
 }
 

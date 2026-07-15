@@ -40,7 +40,7 @@ export function useSession(): SessionState {
       .select('*')
       .eq('id', userId)
       .single()
-    setState(s => ({ ...s, profile: data ?? null, loading: false }))
+    setState(s => ({ ...s, profile: (data as any) ?? null, loading: false }))
   }
 
   return state

@@ -37,9 +37,9 @@ export default function DetailPage() {
     setSubmitting(true)
     await supabase.from('comments').insert({
       recommendation_id: id,
-      user_id: user.id,
-      author_name: profile?.full_name ?? user.email ?? 'Anonymous',
-      body: body.trim(),
+      commenter_id: user.id,
+      commenter_name: profile?.name ?? user.email ?? 'Anonymous',
+      comment_text: body.trim(),
       rating,
     })
     setBody('')
@@ -62,11 +62,10 @@ export default function DetailPage() {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto pb-24">
-      {/* Header image */}
       <div className="relative">
         <div className="aspect-video bg-white/5 overflow-hidden">
           {rec.image_url ? (
-            <img src={rec.image_url} alt={rec.title} className="w-full h-full object-cover" />
+            <img src={rec.image_url} alt={rec.name} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-6xl">
               {categoryEmoji(rec.category)}
@@ -82,15 +81,14 @@ export default function DetailPage() {
       </div>
 
       <div className="px-4 py-4 space-y-5">
-        {/* Title + category */}
         <div className="space-y-1">
           <div className="flex items-start gap-2">
-            <h1 className="text-white text-xl font-bold flex-1">{rec.title}</h1>
+            <h1 className="text-white text-xl font-bold flex-1">{rec.name}</h1>
             <span className={`shrink-0 px-2 py-1 rounded-full text-xs font-medium ${categoryStyles[rec.category]}`}>
               {rec.category}
             </span>
           </div>
-          <p className="text-slate-400 text-sm">{t('by')} {rec.recommender}</p>
+          <p className="text-slate-400 text-sm">{t('by')} {rec.recommender_name}</p>
           {avgRating > 0 && (
             <div className="flex items-center gap-2">
               <StarDisplay rating={avgRating} size="sm" />
@@ -99,10 +97,9 @@ export default function DetailPage() {
           )}
         </div>
 
-        {/* External link */}
-        {rec.url && (
+        {rec.website_link && (
           <a
-            href={rec.url}
+            href={rec.website_link}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-accent inline-flex items-center gap-2 text-sm"
@@ -111,13 +108,13 @@ export default function DetailPage() {
           </a>
         )}
 
-        {/* Description */}
-        <div>
-          <h2 className="text-slate-400 text-xs uppercase tracking-wide mb-1">{t('description')}</h2>
-          <p className="text-white text-sm leading-relaxed">{rec.description}</p>
-        </div>
+        {rec.description && (
+          <div>
+            <h2 className="text-slate-400 text-xs uppercase tracking-wide mb-1">{t('description')}</h2>
+            <p className="text-white text-sm leading-relaxed">{rec.description}</p>
+          </div>
+        )}
 
-        {/* Comments */}
         <div>
           <h2 className="text-slate-400 text-xs uppercase tracking-wide mb-3">
             {t('comments')} ({comments.length})
@@ -131,20 +128,19 @@ export default function DetailPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="w-7 h-7 rounded-full bg-accent/20 text-accent text-xs flex items-center justify-center font-bold">
-                      {c.author_name[0]?.toUpperCase()}
+                      {c.commenter_name[0]?.toUpperCase()}
                     </span>
-                    <span className="text-white text-sm font-medium">{c.author_name}</span>
+                    <span className="text-white text-sm font-medium">{c.commenter_name}</span>
                   </div>
                   <StarDisplay rating={c.rating} size="sm" />
                 </div>
-                <p className="text-slate-300 text-sm">{c.body}</p>
+                {c.comment_text && <p className="text-slate-300 text-sm">{c.comment_text}</p>}
                 <p className="text-slate-500 text-xs">{new Date(c.created_at).toLocaleDateString()}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Add comment */}
         {user && (
           <form onSubmit={submitComment} className="space-y-3 pt-2">
             <h2 className="text-slate-400 text-xs uppercase tracking-wide">{t('addComment')}</h2>
