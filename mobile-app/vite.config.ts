@@ -2,11 +2,14 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
-import { execSync } from 'child_process'
 
 const buildNumber = (() => {
-  try { return execSync('git rev-list --count HEAD').toString().trim() }
-  catch { return '0' }
+  // Vercel shallow-clones, so commit count is unreliable. Use YYMMDD instead.
+  const now = new Date()
+  const yy = String(now.getFullYear()).slice(2)
+  const mm = String(now.getMonth() + 1).padStart(2, '0')
+  const dd = String(now.getDate()).padStart(2, '0')
+  return `${yy}${mm}${dd}`
 })()
 
 export default defineConfig({
