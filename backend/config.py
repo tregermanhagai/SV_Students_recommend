@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     supabase_url: str
     supabase_service_key: str
     frontend_url: str = "http://localhost:8000"
+    allowed_origins: str = ""   # comma-separated extra origins (e.g. Vercel URL)
     openai_api_key: str = ""
     tmdb_api_key: str = ""
 

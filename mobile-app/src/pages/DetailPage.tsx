@@ -19,6 +19,16 @@ export default function DetailPage() {
   const [body, setBody] = useState('')
   const [rating, setRating] = useState(5)
   const [submitting, setSubmitting] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+  const isOwner = user && rec && (user.id === rec.created_by || profile?.is_admin)
+
+  async function deleteRec() {
+    if (!rec || !window.confirm('Delete this recommendation?')) return
+    setDeleting(true)
+    await supabase.from('recommendations').delete().eq('id', rec.id)
+    navigate('/home', { replace: true })
+  }
 
   useEffect(() => { if (id) load(id) }, [id])
 
@@ -78,6 +88,15 @@ export default function DetailPage() {
         >
           ←
         </button>
+        {isOwner && (
+          <button
+            onClick={deleteRec}
+            disabled={deleting}
+            className="absolute top-4 right-4 bg-red-600/80 backdrop-blur-sm text-white rounded-full w-9 h-9 flex items-center justify-center text-sm disabled:opacity-50"
+          >
+            🗑
+          </button>
+        )}
       </div>
 
       <div className="px-4 py-4 space-y-5">

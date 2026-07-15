@@ -100,8 +100,8 @@ export default function MovieAIPage() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
-      <form onSubmit={ask} className="px-4 pb-4 flex gap-2 shrink-0">
+      {/* Input — pb-20 clears the fixed BottomNav */}
+      <form onSubmit={ask} className="px-4 pb-20 pt-2 flex gap-2 shrink-0 bg-bg">
         <input
           className="input-base flex-1"
           placeholder={t('movieAIPlaceholder')}
