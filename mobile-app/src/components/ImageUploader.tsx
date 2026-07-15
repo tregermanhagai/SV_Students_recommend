@@ -11,18 +11,23 @@ export default function ImageUploader({ onUploaded }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
     setPreview(URL.createObjectURL(file))
+    setUploadError(null)
     setUploading(true)
     const ext = file.name.split('.').pop()
     const path = `${Date.now()}.${ext}`
     const { error } = await supabase.storage
       .from('recommendation-images')
       .upload(path, file, { upsert: true })
-    if (!error) {
+    if (error) {
+      setUploadError(error.message)
+      setPreview(null)
+    } else {
       const { data } = supabase.storage.from('recommendation-images').getPublicUrl(path)
       onUploaded(data.publicUrl)
     }
@@ -49,5 +54,8 @@ export default function ImageUploader({ onUploaded }: Props) {
       )}
       <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
     </div>
+    {uploadError && (
+      <p className="text-red-400 text-xs mt-1">Upload failed: {uploadError}</p>
+    )}
   )
 }

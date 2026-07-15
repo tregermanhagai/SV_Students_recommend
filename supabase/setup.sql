@@ -126,6 +126,17 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('recommendation-images', 'recommendation-images', true)
 ON CONFLICT (id) DO NOTHING;
 
+-- Storage RLS policies (required for browser uploads via anon/publishable key)
+DROP POLICY IF EXISTS "storage_select" ON storage.objects;
+DROP POLICY IF EXISTS "storage_insert" ON storage.objects;
+DROP POLICY IF EXISTS "storage_delete" ON storage.objects;
+CREATE POLICY "storage_select" ON storage.objects
+  FOR SELECT USING (bucket_id = 'recommendation-images');
+CREATE POLICY "storage_insert" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'recommendation-images' AND auth.role() = 'authenticated');
+CREATE POLICY "storage_delete" ON storage.objects
+  FOR DELETE USING (bucket_id = 'recommendation-images' AND auth.role() = 'authenticated');
+
 -- ── 9. Shopping cart (per user) ─────────────────────────────
 CREATE TABLE IF NOT EXISTS public.carts (
   user_id    UUID        PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
