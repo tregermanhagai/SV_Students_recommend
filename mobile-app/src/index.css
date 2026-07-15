@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    @apply h-full bg-bg text-white;
+    font-family: Inter, system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    margin: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@layer components {
+  .btn-accent {
+    @apply bg-accent text-bg font-semibold rounded-2xl px-6 py-3 active:opacity-80 transition-opacity;
+  }
+
+  .input-base {
+    @apply w-full bg-card border border-white/10 rounded-2xl px-4 py-3 text-white placeholder-slate-400
+           focus:outline-none focus:border-accent transition-colors;
+  }
+
+  .card-surface {
+    @apply bg-card rounded-2xl;
+  }
+}
