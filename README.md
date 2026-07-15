@@ -7,6 +7,7 @@ A practice sandbox application for SV College students to learn:
 
 ## Production
 
+### Desktop Web App (Render)
 **Live URL:** https://sv-students-recommend.onrender.com/
 
 | Page | URL |
@@ -16,6 +17,19 @@ A practice sandbox application for SV College students to learn:
 | Movie AI Assistant | https://sv-students-recommend.onrender.com/pages/movie-ai.html |
 | API docs (Swagger) | https://sv-students-recommend.onrender.com/docs |
 | Accessibility statement | https://sv-students-recommend.onrender.com/accessibility.html |
+
+### Mobile PWA (Vercel)
+**Live URL:** https://sv-students-recommend-xi.vercel.app/
+
+Installable on iOS (Safari → Add to Home Screen) and Android (Chrome → Install app).
+
+| Page | URL |
+|------|-----|
+| Login | https://sv-students-recommend-xi.vercel.app/login |
+| Home feed | https://sv-students-recommend-xi.vercel.app/home |
+| Movie AI | https://sv-students-recommend-xi.vercel.app/movie-ai |
+| Store | https://sv-students-recommend-xi.vercel.app/store |
+| Profile | https://sv-students-recommend-xi.vercel.app/profile |
 
 ---
 

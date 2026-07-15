@@ -109,6 +109,7 @@ figure img{display:block;width:100%;height:auto}
     <a href="#pages">4. מדריך מסכים</a>
     <a href="#pages" class="sub">4.10 עמוד עוזר AI לסרטים</a>
     <a href="#api">5. ממשק API</a>
+    <a href="#mobile">6. אפליקציית Mobile PWA</a>
   </nav>
 </aside>
 
@@ -117,7 +118,8 @@ figure img{display:block;width:100%;height:auto}
     <div class="kicker">SOFTWARE REQUIREMENTS SPECIFICATION</div>
     <h1 class="title">מסמך אפיון <em>דרישות</em></h1>
     <p class="sub">מערכת SV Students Recommend — אפיון תפקודי מלא</p>
-    <p class="appurl"><span class="lbl-app">APP</span> <a href="https://sv-students-recommend.onrender.com" target="_blank" rel="noopener">https://sv-students-recommend.onrender.com</a></p>
+    <p class="appurl"><span class="lbl-app">Desktop</span> <a href="https://sv-students-recommend.onrender.com" target="_blank" rel="noopener">https://sv-students-recommend.onrender.com</a></p>
+    <p class="appurl" style="margin-top:6px"><span class="lbl-app" style="background:#06C8E0;color:#0F1117">Mobile PWA</span> <a href="https://sv-students-recommend-xi.vercel.app" target="_blank" rel="noopener">https://sv-students-recommend-xi.vercel.app</a></p>
   </div>
 
   <section id="intro">
@@ -395,6 +397,50 @@ figure img{display:block;width:100%;height:auto}
         <tr><td class="ref">404 Not Found</td><td>לא קיים</td><td>מזהה שגוי או כתובת שגויה.</td></tr>
       </tbody>
     </table></div>
+  </section>
+
+  <section id="mobile">
+    <h2>6. אפליקציית Mobile PWA</h2>
+    <p>בנוסף לאפליקציית הווב הרגילה (Render), קיימת גרסת <strong>Progressive Web App (PWA)</strong> מותאמת למובייל, פרוסה ב-Vercel.</p>
+
+    <p class="appurl"><span class="lbl-app" style="background:#06C8E0;color:#0F1117">Mobile PWA</span>
+      <a href="https://sv-students-recommend-xi.vercel.app" target="_blank" rel="noopener" dir="ltr">https://sv-students-recommend-xi.vercel.app</a>
+    </p>
+
+    <h3>6.1 ערימת טכנולוגיות</h3>
+    <ul>
+      <li>React 18 + Vite + TypeScript</li>
+      <li>Tailwind CSS — ערכת עיצוב כהה (Dark Theme)</li>
+      <li>Supabase JS Client v2 — גישה ישירה ל-DB ללא FastAPI</li>
+      <li>React Router v6 — ניתוב בצד הלקוח</li>
+      <li>Framer Motion — אנימציות</li>
+      <li>vite-plugin-pwa — ניתן להתקנה כאפליקציית מובייל</li>
+    </ul>
+
+    <h3>6.2 דפים ו-URL</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:15px">
+      <thead><tr style="background:var(--navy);color:#fff">
+        <th style="padding:8px 12px;text-align:right">דף</th>
+        <th style="padding:8px 12px;text-align:left" dir="ltr">URL</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--line)">התחברות</td><td style="padding:8px 12px;border-bottom:1px solid var(--line)" dir="ltr">/login</td></tr>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--line)">הרשמה</td><td style="padding:8px 12px;border-bottom:1px solid var(--line)" dir="ltr">/register</td></tr>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--line)">בית (פיד המלצות)</td><td style="padding:8px 12px;border-bottom:1px solid var(--line)" dir="ltr">/home</td></tr>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--line)">פירוט המלצה</td><td style="padding:8px 12px;border-bottom:1px solid var(--line)" dir="ltr">/recommendations/:id</td></tr>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--line)">הוספת המלצה</td><td style="padding:8px 12px;border-bottom:1px solid var(--line)" dir="ltr">/add</td></tr>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--line)">עוזר AI לסרטים</td><td style="padding:8px 12px;border-bottom:1px solid var(--line)" dir="ltr">/movie-ai</td></tr>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--line)">חנות</td><td style="padding:8px 12px;border-bottom:1px solid var(--line)" dir="ltr">/store</td></tr>
+        <tr><td style="padding:8px 12px">פרופיל</td><td style="padding:8px 12px" dir="ltr">/profile</td></tr>
+      </tbody>
+    </table>
+
+    <h3>6.3 התקנה כאפליקציית מובייל</h3>
+    <ul>
+      <li><strong>iPhone (Safari):</strong> שתפו את הדף ← "הוסף למסך הבית"</li>
+      <li><strong>Android (Chrome):</strong> תפריט ← "התקן אפליקציה" / "הוסף למסך הבית"</li>
+      <li><strong>Chrome (מחשב):</strong> לחצו על סמל ההתקנה בשורת הכתובת</li>
+    </ul>
   </section>
 
   <p class="endnote">מסמך אפיון דרישות · SV Students Recommend · גרסה עברית</p>

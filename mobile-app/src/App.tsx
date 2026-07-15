@@ -11,6 +11,7 @@ const DetailPage     = lazy(() => import('@/pages/DetailPage'))
 const AddPage        = lazy(() => import('@/pages/AddPage'))
 const MovieAIPage    = lazy(() => import('@/pages/MovieAIPage'))
 const ProfilePage    = lazy(() => import('@/pages/ProfilePage'))
+const StorePage      = lazy(() => import('@/pages/StorePage'))
 
 function PageSpinner() {
   return (
@@ -47,6 +48,7 @@ export default function App() {
           <Route path="/add"                   element={<AddPage />} />
           <Route path="/movie-ai"              element={<MovieAIPage />} />
           <Route path="/profile"               element={<ProfilePage />} />
+          <Route path="/store"                 element={<StorePage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/home" replace />} />

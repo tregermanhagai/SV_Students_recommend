@@ -140,7 +140,8 @@ code.inline{font-family:"JetBrains Mono",monospace;font-size:13px;background:#ef
     <div class="kicker">Software Requirements Specification</div>
     <h1 class="title">SV Students <em>Recommend</em></h1>
     <p class="sub">QA Testing Project — API &amp; UI End-to-End testing with Playwright (Python)</p>
-    <p class="appurl"><span class="lbl" style="background:var(--navy);color:#fff;padding:2px 8px;border-radius:5px">APP</span> <a href="https://sv-students-recommend.onrender.com" target="_blank" rel="noopener">https://sv-students-recommend.onrender.com</a></p>
+    <p class="appurl"><span class="lbl" style="background:var(--navy);color:#fff;padding:2px 8px;border-radius:5px">Desktop</span> <a href="https://sv-students-recommend.onrender.com" target="_blank" rel="noopener">https://sv-students-recommend.onrender.com</a></p>
+    <p class="appurl"><span class="lbl" style="background:#06C8E0;color:#0F1117;padding:2px 8px;border-radius:5px">Mobile PWA</span> <a href="https://sv-students-recommend-xi.vercel.app" target="_blank" rel="noopener">https://sv-students-recommend-xi.vercel.app</a></p>
   </div>
 
   <section id="intro">
@@ -687,6 +688,44 @@ def test_login_success(page: Page):
       <h4>Bonus challenge</h4>
       <p>Generate a fresh unique user every run. Add the blacklist test (admin blocks an email → it cannot register) and the suspend test (admin freezes new recommendations → a user cannot create one).</p>
     </div>
+  </section>
+
+  <section id="mobile">
+    <h2>Mobile PWA</h2>
+    <p>In addition to the desktop web app, there is a <strong>Progressive Web App (PWA)</strong> optimised for mobile, deployed on Vercel.</p>
+    <p class="appurl"><span class="lbl" style="background:#06C8E0;color:#0F1117;padding:2px 8px;border-radius:5px">Mobile PWA</span>
+      <a href="https://sv-students-recommend-xi.vercel.app" target="_blank" rel="noopener">https://sv-students-recommend-xi.vercel.app</a>
+    </p>
+    <h3>Tech stack</h3>
+    <ul>
+      <li>React 18 + Vite + TypeScript</li>
+      <li>Tailwind CSS — dark theme with custom design tokens</li>
+      <li>Supabase JS Client v2 — direct DB access (no FastAPI in between)</li>
+      <li>React Router v6, Framer Motion, vite-plugin-pwa</li>
+    </ul>
+    <h3>Pages</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:15px">
+      <thead><tr style="background:var(--navy);color:#fff">
+        <th style="padding:8px 12px;text-align:left">Page</th>
+        <th style="padding:8px 12px;text-align:left">URL</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--line)">Login</td><td style="padding:8px 12px;border-bottom:1px solid var(--line)">/login</td></tr>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--line)">Register</td><td style="padding:8px 12px;border-bottom:1px solid var(--line)">/register</td></tr>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--line)">Home feed</td><td style="padding:8px 12px;border-bottom:1px solid var(--line)">/home</td></tr>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--line)">Recommendation detail</td><td style="padding:8px 12px;border-bottom:1px solid var(--line)">/recommendations/:id</td></tr>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--line)">Add recommendation</td><td style="padding:8px 12px;border-bottom:1px solid var(--line)">/add</td></tr>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--line)">Movie AI</td><td style="padding:8px 12px;border-bottom:1px solid var(--line)">/movie-ai</td></tr>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--line)">Store</td><td style="padding:8px 12px;border-bottom:1px solid var(--line)">/store</td></tr>
+        <tr><td style="padding:8px 12px">Profile</td><td style="padding:8px 12px">/profile</td></tr>
+      </tbody>
+    </table>
+    <h3>Installation</h3>
+    <ul>
+      <li><strong>iPhone (Safari):</strong> Share → Add to Home Screen</li>
+      <li><strong>Android (Chrome):</strong> Menu → Install app / Add to Home Screen</li>
+      <li><strong>Chrome desktop:</strong> Click the install icon in the address bar</li>
+    </ul>
   </section>
 
   <p class="endnote">SRS · SV Students Recommend · QA Student Workbook · Selections are tracking aids only and are not saved between visits.</p>
